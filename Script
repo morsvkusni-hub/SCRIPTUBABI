@@ -9,7 +9,7 @@ local LP = Players.LocalPlayer
 --==========================================================
 --          KEY SYSTEM (стиль меню)
 --==========================================================
-local VALID_KEY = "@kotyk_w_script"
+local VALID_KEY = "@kotyk_prostoy"
 local TG_LINK = "t.me/kotyk_software"
 
 local function keyCheck()
