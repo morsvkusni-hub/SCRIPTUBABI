@@ -1,107 +1,118 @@
 --[[
-    @kotyk_software HUB v4
-    Rayfield UI + Safe Camera Aimbot (NO HOOKS)
-    Key: @kotyk_software | Купить: @kotyk_prostoy
+    @kotyk_prostoy | DeagleArena Rebrand
+    Original: vita8it/DeagleArena
+    Key: @kotyk_prostoy
 ]]
 
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 local LP = Players.LocalPlayer
 
 --==========================================================
---          KEY SYSTEM + DEMO
+--          KEY SYSTEM
 --==========================================================
-local VALID_KEY = "@kotyk_software"
+local VALID_KEY = "@kotyk_prostoy"
 
 local function keyCheck()
     local PG = LP:WaitForChild("PlayerGui")
     local kgui = Instance.new("ScreenGui")
-    kgui.Name = "kotyk_key"; kgui.ResetOnSpawn = false; kgui.Parent = PG; kgui.DisplayOrder = 999
+    kgui.Name = "kotyk_key"
+    kgui.ResetOnSpawn = false
+    kgui.Parent = PG
+    kgui.DisplayOrder = 999
 
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(0, 360, 0, 240)
-    bg.Position = UDim2.new(0.5, -180, 0.5, -120)
+    bg.Size = UDim2.new(0, 360, 0, 220)
+    bg.Position = UDim2.new(0.5, -180, 0.5, -110)
     bg.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-    bg.BorderSizePixel = 0; bg.Parent = kgui
+    bg.BorderSizePixel = 0
+    bg.Parent = kgui
     Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 12)
-    local st = Instance.new("UIStroke", bg)
-    st.Color = Color3.fromRGB(255, 90, 90); st.Thickness = 1.5
+    local stroke = Instance.new("UIStroke", bg)
+    stroke.Color = Color3.fromRGB(255, 90, 90)
+    stroke.Thickness = 1.5
 
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 42); title.BackgroundTransparency = 1
-    title.Text = "@kotyk_software"; title.TextColor3 = Color3.fromRGB(255, 90, 90)
-    title.TextSize = 22; title.Font = Enum.Font.GothamBold; title.Parent = bg
+    title.Size = UDim2.new(1, 0, 0, 42)
+    title.BackgroundTransparency = 1
+    title.Text = "@kotyk_prostoy"
+    title.TextColor3 = Color3.fromRGB(255, 90, 90)
+    title.TextSize = 22
+    title.Font = Enum.Font.GothamBold
+    title.Parent = bg
 
     local sub = Instance.new("TextLabel")
-    sub.Size = UDim2.new(1, 0, 0, 16); sub.Position = UDim2.new(0, 0, 0, 40)
-    sub.BackgroundTransparency = 1; sub.Text = "Введите ключ или попробуйте DEMO"
+    sub.Size = UDim2.new(1, 0, 0, 16)
+    sub.Position = UDim2.new(0, 0, 0, 40)
+    sub.BackgroundTransparency = 1
+    sub.Text = "Введите ключ для доступа"
     sub.TextColor3 = Color3.fromRGB(150, 150, 160)
-    sub.TextSize = 11; sub.Font = Enum.Font.Gotham; sub.Parent = bg
+    sub.TextSize = 11
+    sub.Font = Enum.Font.Gotham
+    sub.Parent = bg
 
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -40, 0, 38); box.Position = UDim2.new(0, 20, 0, 66)
-    box.BackgroundColor3 = Color3.fromRGB(28, 28, 34); box.BorderSizePixel = 0
-    box.PlaceholderText = "Key..."; box.Text = ""
+    box.Size = UDim2.new(1, -40, 0, 38)
+    box.Position = UDim2.new(0, 20, 0, 66)
+    box.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+    box.BorderSizePixel = 0
+    box.PlaceholderText = "Key..."
+    box.Text = ""
     box.TextColor3 = Color3.fromRGB(230, 230, 235)
     box.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
-    box.TextSize = 14; box.Font = Enum.Font.GothamMedium
-    box.ClearTextOnFocus = false; box.Parent = bg
+    box.TextSize = 14
+    box.Font = Enum.Font.GothamMedium
+    box.ClearTextOnFocus = false
+    box.Parent = bg
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.5, -25, 0, 38); btn.Position = UDim2.new(0, 20, 0, 112)
+    btn.Size = UDim2.new(1, -40, 0, 38)
+    btn.Position = UDim2.new(0, 20, 0, 112)
     btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
-    btn.Text = "Submit"; btn.TextColor3 = Color3.new(1,1,1)
-    btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Parent = bg
+    btn.Text = "Submit"
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = bg
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-    local demoBtn = Instance.new("TextButton")
-    demoBtn.Size = UDim2.new(0.5, -25, 0, 38); demoBtn.Position = UDim2.new(0.5, 5, 0, 112)
-    demoBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-    demoBtn.Text = "DEMO"; demoBtn.TextColor3 = Color3.fromRGB(230, 230, 235)
-    demoBtn.TextSize = 14; demoBtn.Font = Enum.Font.GothamBold; demoBtn.Parent = bg
-    Instance.new("UICorner", demoBtn).CornerRadius = UDim.new(0, 6)
-
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -20, 0, 40); status.Position = UDim2.new(0, 10, 0, 158)
-    status.BackgroundTransparency = 1; status.Text = ""
+    status.Size = UDim2.new(1, -20, 0, 20)
+    status.Position = UDim2.new(0, 10, 0, 158)
+    status.BackgroundTransparency = 1
+    status.Text = ""
     status.TextColor3 = Color3.fromRGB(255, 90, 90)
-    status.TextSize = 12; status.Font = Enum.Font.GothamMedium
-    status.TextWrapped = true; status.Parent = bg
+    status.TextSize = 12
+    status.Font = Enum.Font.GothamMedium
+    status.Parent = bg
 
     local footer = Instance.new("TextLabel")
-    footer.Size = UDim2.new(1, 0, 0, 16); footer.Position = UDim2.new(0, 0, 1, -20)
+    footer.Size = UDim2.new(1, 0, 0, 16)
+    footer.Position = UDim2.new(0, 0, 1, -22)
     footer.BackgroundTransparency = 1
     footer.Text = "Купить ключ у @kotyk_prostoy"
     footer.TextColor3 = Color3.fromRGB(120, 120, 130)
-    footer.TextSize = 11; footer.Font = Enum.Font.Gotham; footer.Parent = bg
+    footer.TextSize = 11
+    footer.Font = Enum.Font.Gotham
+    footer.Parent = bg
 
     local done = false
-
-    demoBtn.MouseButton1Click:Connect(function()
-        box.Text = ""
-        status.TextColor3 = Color3.fromRGB(255, 200, 80)
-        status.Text = "Это демо-режим.\nКупите ключ у @kotyk_prostoy"
-        demoBtn.Text = "3..."
-        task.wait(1); if demoBtn.Parent then demoBtn.Text = "2..." end
-        task.wait(1); if demoBtn.Parent then demoBtn.Text = "1..." end
-        task.wait(1)
-        if kgui and kgui.Parent then kgui:Destroy() end
-        warn("[@kotyk_software] DEMO MODE")
-    end)
-
     local function try()
         if box.Text == VALID_KEY then
-            done = true; status.Text = "Access granted!"
+            done = true
+            status.Text = "Access granted!"
             status.TextColor3 = Color3.fromRGB(80, 200, 120)
-            task.wait(0.4); if kgui and kgui.Parent then kgui:Destroy() end
+            task.wait(0.4)
+            if kgui and kgui.Parent then kgui:Destroy() end
         else
-            status.Text = "Неверный ключ!\nКупите у @kotyk_prostoy"
+            status.Text = "Неверный ключ!"
             status.TextColor3 = Color3.fromRGB(255, 90, 90)
             box.Text = ""
         end
     end
     btn.MouseButton1Click:Connect(try)
-    box.FocusLost:Connect(function(e) if e then try() end end)
+    box.FocusLost:Connect(function(enter) if enter then try() end end)
 
     repeat task.wait(0.1) until done or not kgui.Parent
     return done
@@ -110,271 +121,171 @@ end
 if not keyCheck() then return end
 
 --==========================================================
---          RAYFIELD
+--          REBRAND HOOK (подмена заголовка окна)
 --==========================================================
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local oldHttpGet = game.HttpGet
+local patched = false
 
-local Window = Rayfield:CreateWindow({
-    Name = "@kotyk_software | Aimbot",
-    LoadingTitle = "@kotyk_software",
-    LoadingSubtitle = "Safe Edition",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "kotyk_software",
-        FileName = "AimbotConfig"
-    },
-    Discord = { Enabled = false, Invite = "", RememberJoins = true },
-    KeySystem = false
-})
-
---==========================================================
---          SETTINGS
---==========================================================
-local Settings = {
-    Enabled = false,
-    TargetPart = "Head",
-    FOV = 150,
-    MaxDistance = 500,
-    Smoothness = 25,   -- в процентах (5-100)
-    TeamCheck = true,
-    WallCheck = true,
-    HoldKey = nil,     -- nil = всегда, Enum.KeyCode.X = по клавише
-    ShowFOV = false,
-    ShowTarget = false,
-}
-
-local Camera = workspace.CurrentCamera
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-
---==========================================================
---          DRAWING (безопасно — только локальные объекты)
---==========================================================
-local fovCircle = Drawing.new("Circle")
-fovCircle.Thickness = 1
-fovCircle.NumSides = 100
-fovCircle.Filled = false
-fovCircle.Visible = false
-fovCircle.Color = Color3.fromRGB(54, 57, 241)
-
-local targetDot = Drawing.new("Circle")
-targetDot.Thickness = 2
-targetDot.NumSides = 30
-targetDot.Radius = 6
-targetDot.Filled = false
-targetDot.Visible = false
-targetDot.Color = Color3.fromRGB(255, 90, 90)
-
---==========================================================
---          UTILS
---==========================================================
-local function getRoot()
-    local c = LP.Character
-    return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso"))
-end
-
-local function isHolding()
-    if not Settings.HoldKey then return true end
-    return UIS:IsKeyDown(Settings.HoldKey)
-end
-
-local function getTarget()
-    local myRoot = getRoot(); if not myRoot then return nil end
-    local closest, best = nil, Settings.FOV
-    local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr == LP then continue end
-        if Settings.TeamCheck and plr.Team and plr.Team == LP.Team then continue end
-        local char = plr.Character; if not char then continue end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum or hum.Health <= 0 then continue end
-
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        local part = char:FindFirstChild(Settings.TargetPart) or hrp
-        if not part or not hrp then continue end
-
-        -- DISTANCE CHECK
-        local dist = (hrp.Position - myRoot.Position).Magnitude
-        if dist > Settings.MaxDistance then continue end
-
-        local sp, onS = Camera:WorldToViewportPoint(part.Position)
-        if not onS then continue end
-
-        -- WALL CHECK
-        if Settings.WallCheck then
-            local rp = RaycastParams.new()
-            rp.FilterType = Enum.RaycastFilterType.Exclude
-            rp.FilterDescendantsInstances = {LP.Character}
-            local ray = workspace:Raycast(Camera.CFrame.Position,
-                (part.Position - Camera.CFrame.Position).Unit * 1000, rp)
-            if ray and not ray.Instance:IsDescendantOf(char) then continue end
-        end
-
-        local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
-        if d < best then closest, best = part, d end
-    end
-    return closest
-end
-
---==========================================================
---          RENDER LOOP (только камера, БЕЗ ХУКОВ)
---==========================================================
-RunService.RenderStepped:Connect(function()
-    -- FOV Circle
-    if Settings.ShowFOV then
-        fovCircle.Visible = true
-        fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-        fovCircle.Radius = Settings.FOV
-    else
-        fovCircle.Visible = false
-    end
-
-    local target = nil
-    if Settings.Enabled and isHolding() then
-        target = getTarget()
-    end
-
-    -- Target Dot
-    if Settings.ShowTarget and target then
-        local sp, onS = Camera:WorldToViewportPoint(target.Position)
-        if onS then
-            targetDot.Visible = true
-            targetDot.Position = Vector2.new(sp.X, sp.Y)
-        else
-            targetDot.Visible = false
-        end
-    else
-        targetDot.Visible = false
-    end
-
-    -- AIMBOT — плавный доворот камеры
-    if target then
-        local targetCF = CFrame.new(Camera.CFrame.Position, target.Position)
-        Camera.CFrame = Camera.CFrame:Lerp(targetCF, Settings.Smoothness / 100)
+-- Перехват DescendantAdded, чтобы заменить текст в заголовке
+local PG = LP:WaitForChild("PlayerGui")
+PG.DescendantAdded:Connect(function(obj)
+    if patched then return end
+    if obj:IsA("TextLabel") or obj:IsA("TextButton") then
+        task.defer(function()
+            local t = obj.Text
+            if t and (t:find("vita8it") or t:find("Deagle") or t:find("Aimbot + ESP")) then
+                obj.Text = t:gsub("vita8it", "@kotyk_prostoy")
+                              :gsub("DeagleArena", "@kotyk_prostoy Hub")
+                              :gsub("Made by", "by")
+                patched = true
+            end
+        end)
     end
 end)
 
 --==========================================================
---          UI
+--          CONFIG SYSTEM
 --==========================================================
-local MainTab   = Window:CreateTab("Aimbot", 4483362458)
-local VisTab    = Window:CreateTab("Visuals", 4483362458)
-local ConfigTab = Window:CreateTab("Config", 4483362458)
+local CONFIG_FOLDER = "kotyk_prostoy"
+local CONFIG_FILE = "deagle_config.json"
 
-MainTab:CreateSection("Aimbot")
+local function ensureFolder()
+    if isfolder and not isfolder(CONFIG_FOLDER) then
+        pcall(makefolder, CONFIG_FOLDER)
+    end
+end
 
-MainTab:CreateToggle({
-    Name = "Enable Aimbot",
-    CurrentValue = false,
-    Flag = "Enabled",
-    Callback = function(v) Settings.Enabled = v end
-})
+local function saveConfig(data)
+    ensureFolder()
+    if writefile then
+        pcall(writefile, CONFIG_FOLDER .. "/" .. CONFIG_FILE, HttpService:JSONEncode(data))
+        return true
+    end
+    return false
+end
 
-MainTab:CreateKeybind({
-    Name = "Hold Key (пусто = всегда вкл)",
-    CurrentKeybind = "",
-    HoldToInteract = true,
-    Flag = "HoldKey",
-    Callback = function(k)
-        if k == "" then
-            Settings.HoldKey = nil
-        else
-            pcall(function() Settings.HoldKey = Enum.KeyCode[k] end)
+local function loadConfig()
+    ensureFolder()
+    if isfile and isfile(CONFIG_FOLDER .. "/" .. CONFIG_FILE) then
+        local ok, content = pcall(readfile, CONFIG_FOLDER .. "/" .. CONFIG_FILE)
+        if ok and content then
+            local ok2, data = pcall(HttpService.JSONDecode, HttpService, content)
+            if ok2 then return data end
         end
     end
-})
-
-MainTab:CreateDropdown({
-    Name = "Target Part",
-    Options = {"Head", "HumanoidRootPart", "Torso", "UpperTorso"},
-    CurrentOption = {"Head"},
-    Flag = "TargetPart",
-    Callback = function(o)
-        if typeof(o) == "table" then o = o[1] end
-        Settings.TargetPart = o
-    end
-})
-
-MainTab:CreateSlider({
-    Name = "FOV",
-    Range = {10, 500},
-    Increment = 1,
-    Suffix = "px",
-    CurrentValue = 150,
-    Flag = "FOV",
-    Callback = function(v) Settings.FOV = v end
-})
-
-MainTab:CreateSlider({
-    Name = "Max Distance",
-    Range = {50, 2000},
-    Increment = 10,
-    Suffix = " studs",
-    CurrentValue = 500,
-    Flag = "MaxDistance",
-    Callback = function(v) Settings.MaxDistance = v end
-})
-
-MainTab:CreateSlider({
-    Name = "Smoothness",
-    Range = {5, 100},
-    Increment = 1,
-    Suffix = "%",
-    CurrentValue = 25,
-    Flag = "Smoothness",
-    Callback = function(v) Settings.Smoothness = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Team Check",
-    CurrentValue = true,
-    Flag = "TeamCheck",
-    Callback = function(v) Settings.TeamCheck = v end
-})
-
-MainTab:CreateToggle({
-    Name = "Wall Check",
-    CurrentValue = true,
-    Flag = "WallCheck",
-    Callback = function(v) Settings.WallCheck = v end
-})
-
-VisTab:CreateToggle({
-    Name = "Show FOV Circle",
-    CurrentValue = false,
-    Flag = "ShowFOV",
-    Callback = function(v) Settings.ShowFOV = v end
-})
-
-VisTab:CreateToggle({
-    Name = "Show Target Dot",
-    CurrentValue = false,
-    Flag = "ShowTarget",
-    Callback = function(v) Settings.ShowTarget = v end
-})
-
-ConfigTab:CreateButton({
-    Name = "Save Config",
-    Callback = function()
-        Rayfield:SaveConfiguration()
-        Rayfield:Notify({Title = "@kotyk_software", Content = "Сохранено!", Duration = 3})
-    end
-})
-
-ConfigTab:CreateButton({
-    Name = "Load Config",
-    Callback = function()
-        Rayfield:LoadConfiguration()
-        Rayfield:Notify({Title = "@kotyk_software", Content = "Загружено!", Duration = 3})
-    end
-})
+    return nil
+end
 
 --==========================================================
-Rayfield:Notify({
-    Title = "@kotyk_software",
-    Content = "Aimbot загружен. Без хуков — античит не тронет.",
-    Duration = 5
-})
+--          CONFIG UI (отдельное маленькое окно)
+--==========================================================
+local ConfigGui = Instance.new("ScreenGui")
+ConfigGui.Name = "kotyk_configs"
+ConfigGui.ResetOnSpawn = false
+ConfigGui.Parent = PG
 
-print("[@kotyk_software] Loaded. NO hooks. Safe camera aimbot only.")
+local cfgBtn = Instance.new("TextButton")
+cfgBtn.Size = UDim2.new(0, 100, 0, 32)
+cfgBtn.Position = UDim2.new(0, 20, 0.5, -16)
+cfgBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+cfgBtn.Text = "⚙ Configs"
+cfgBtn.TextColor3 = Color3.fromRGB(230, 230, 235)
+cfgBtn.TextSize = 13
+cfgBtn.Font = Enum.Font.GothamBold
+cfgBtn.Parent = ConfigGui
+Instance.new("UICorner", cfgBtn).CornerRadius = UDim.new(0, 6)
+Instance.new("UIStroke", cfgBtn).Color = Color3.fromRGB(255, 90, 90)
+
+local cfgPanel = Instance.new("Frame")
+cfgPanel.Size = UDim2.new(0, 240, 0, 260)
+cfgPanel.Position = UDim2.new(0, 130, 0.5, -130)
+cfgPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+cfgPanel.BorderSizePixel = 0
+cfgPanel.Visible = false
+cfgPanel.Parent = ConfigGui
+Instance.new("UICorner", cfgPanel).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", cfgPanel).Color = Color3.fromRGB(255, 90, 90)
+
+local cfgTitle = Instance.new("TextLabel")
+cfgTitle.Size = UDim2.new(1, 0, 0, 34)
+cfgTitle.BackgroundTransparency = 1
+cfgTitle.Text = "@kotyk_prostoy | Configs"
+cfgTitle.TextColor3 = Color3.fromRGB(255, 90, 90)
+cfgTitle.TextSize = 13
+cfgTitle.Font = Enum.Font.GothamBold
+cfgTitle.Parent = cfgPanel
+
+local function cfgButton(text, y, color, callback)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -20, 0, 34)
+    b.Position = UDim2.new(0, 10, 0, y)
+    b.BackgroundColor3 = color or Color3.fromRGB(35, 35, 42)
+    b.Text = text
+    b.TextColor3 = Color3.fromRGB(230, 230, 235)
+    b.TextSize = 13
+    b.Font = Enum.Font.GothamMedium
+    b.Parent = cfgPanel
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    b.MouseButton1Click:Connect(callback)
+    return b
+end
+
+cfgButton("💾 Save Config", 44, Color3.fromRGB(35, 60, 45), function()
+    local data = {
+        timestamp = os.time(),
+        author = "@kotyk_prostoy",
+        -- сюда складывай настройки из UI (нужно привязывать вручную)
+        version = 1
+    }
+    if saveConfig(data) then
+        cfgTitle.Text = "✓ Сохранено!"
+        task.wait(1)
+        cfgTitle.Text = "@kotyk_prostoy | Configs"
+    else
+        cfgTitle.Text = "✗ Ошибка сохранения"
+    end
+end)
+
+cfgButton("📂 Load Config", 84, Color3.fromRGB(35, 45, 60), function()
+    local data = loadConfig()
+    if data then
+        cfgTitle.Text = "✓ Загружено!"
+        -- применить data к UI здесь
+        task.wait(1)
+        cfgTitle.Text = "@kotyk_prostoy | Configs"
+    else
+        cfgTitle.Text = "✗ Нет конфига"
+    end
+end)
+
+cfgButton("🗑 Reset Config", 124, Color3.fromRGB(60, 35, 35), function()
+    if delfile then
+        pcall(delfile, CONFIG_FOLDER .. "/" .. CONFIG_FILE)
+    end
+    cfgTitle.Text = "✓ Сброшено!"
+    task.wait(1)
+    cfgTitle.Text = "@kotyk_prostoy | Configs"
+end)
+
+cfgButton("❌ Close", 200, Color3.fromRGB(40, 40, 48), function()
+    cfgPanel.Visible = false
+end)
+
+cfgBtn.MouseButton1Click:Connect(function()
+    cfgPanel.Visible = not cfgPanel.Visible
+end)
+
+--==========================================================
+--          LOAD ORIGINAL SCRIPT
+--==========================================================
+print("[@kotyk_prostoy] Loading DeagleArena...")
+
+local ok, err = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/vita8it/Vibe/main/DeagleArena.luau"))()
+end)
+
+if not ok then
+    warn("[@kotyk_prostoy] Ошибка загрузки скрипта: " .. tostring(err))
+else
+    print("[@kotyk_prostoy] DeagleArena успешно загружен.")
+end
