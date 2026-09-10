@@ -1,6 +1,6 @@
 --[[
-    @kotyk_software HUB v3
-    Rayfield UI + Dual-Mode Aimbot
+    @kotyk_software HUB v4
+    Rayfield UI + Safe Camera Aimbot (NO HOOKS)
     Key: @kotyk_software | Купить: @kotyk_prostoy
 ]]
 
@@ -135,13 +135,12 @@ local Settings = {
     TargetPart = "Head",
     FOV = 150,
     MaxDistance = 500,
-    Smoothness = 0.25,
+    Smoothness = 25,   -- в процентах (5-100)
     TeamCheck = true,
     WallCheck = true,
-    HoldKey = nil, -- nil = always, Enum.UserInputType.MouseButton2 = ПКМ
+    HoldKey = nil,     -- nil = всегда, Enum.KeyCode.X = по клавише
     ShowFOV = false,
     ShowTarget = false,
-    AggressiveMode = false -- ВНИМАНИЕ: может кикнуть!
 }
 
 local Camera = workspace.CurrentCamera
@@ -149,7 +148,7 @@ local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 --==========================================================
---          DRAWING
+--          DRAWING (безопасно — только локальные объекты)
 --==========================================================
 local fovCircle = Drawing.new("Circle")
 fovCircle.Thickness = 1
@@ -176,9 +175,6 @@ end
 
 local function isHolding()
     if not Settings.HoldKey then return true end
-    if Settings.HoldKey.EnumType == Enum.UserInputType then
-        return UIS:IsMouseButtonPressed(Settings.HoldKey)
-    end
     return UIS:IsKeyDown(Settings.HoldKey)
 end
 
@@ -194,7 +190,6 @@ local function getTarget()
         local hum = char:FindFirstChildOfClass("Humanoid")
         if not hum or hum.Health <= 0 then continue end
 
-        -- цель — таргет парт, но с фоллбэком на HRP для дистанции
         local hrp = char:FindFirstChild("HumanoidRootPart")
         local part = char:FindFirstChild(Settings.TargetPart) or hrp
         if not part or not hrp then continue end
@@ -223,7 +218,7 @@ local function getTarget()
 end
 
 --==========================================================
---          AIMBOT (без хуков — SAFE)
+--          RENDER LOOP (только камера, БЕЗ ХУКОВ)
 --==========================================================
 RunService.RenderStepped:Connect(function()
     -- FOV Circle
@@ -235,17 +230,17 @@ RunService.RenderStepped:Connect(function()
         fovCircle.Visible = false
     end
 
+    local target = nil
+    if Settings.Enabled and isHolding() then
+        target = getTarget()
+    end
+
     -- Target Dot
-    if Settings.ShowTarget and Settings.Enabled then
-        local t = getTarget()
-        if t then
-            local sp, onS = Camera:WorldToViewportPoint(t.Position)
-            if onS then
-                targetDot.Visible = true
-                targetDot.Position = Vector2.new(sp.X, sp.Y)
-            else
-                targetDot.Visible = false
-            end
+    if Settings.ShowTarget and target then
+        local sp, onS = Camera:WorldToViewportPoint(target.Position)
+        if onS then
+            targetDot.Visible = true
+            targetDot.Position = Vector2.new(sp.X, sp.Y)
         else
             targetDot.Visible = false
         end
@@ -253,99 +248,18 @@ RunService.RenderStepped:Connect(function()
         targetDot.Visible = false
     end
 
-    -- AIMBOT
-    if Settings.Enabled and isHolding() then
-        local t = getTarget()
-        if t then
-            local targetCF = CFrame.new(Camera.CFrame.Position, t.Position)
-            Camera.CFrame = Camera.CFrame:Lerp(targetCF, Settings.Smoothness)
-        end
-    end
-end)
-
---==========================================================
---          AGGRESSIVE MODE (хуки — риск кика)
---==========================================================
-local Hooks = { nc = nil, idx = nil }
-
-local function startAggressive()
-    if Hooks.nc then return end
-
-    local Mouse = LP:GetMouse()
-
-    local oldNC
-    oldNC = hookmetamethod(game, "__namecall", newcclosure(function(...)
-        local method = getnamecallmethod()
-        local args = {...}
-        local self = args[1]
-
-        if not checkcaller() and Settings.Enabled and isHolding() then
-            if self == workspace and (method == "Raycast" or method == "FindPartOnRay"
-            or method == "FindPartOnRayWithIgnoreList" or method == "FindPartOnRayWithWhitelist") then
-                local target = getTarget()
-                if target then
-                    if method == "Raycast" then
-                        if typeof(args[2]) == "Vector3" and typeof(args[3]) == "Vector3" then
-                            local origin = args[2]
-                            args[3] = (target.Position - origin).Unit * 1000
-                            return oldNC(table.unpack(args))
-                        end
-                    else
-                        local aRay = args[2]
-                        if typeof(aRay) == "Ray" then
-                            local origin = aRay.Origin
-                            args[2] = Ray.new(origin, (target.Position - origin).Unit * 1000)
-                            return oldNC(table.unpack(args))
-                        end
-                    end
-                end
-            end
-        end
-        return oldNC(...)
-    end))
-
-    local oldIdx
-    oldIdx = hookmetamethod(game, "__index", newcclosure(function(self, key)
-        if not checkcaller() and Settings.Enabled and isHolding() and self == Mouse then
-            if key == "Hit" then
-                local t = getTarget()
-                if t then return t.CFrame end
-            elseif key == "Target" then
-                local t = getTarget()
-                if t then return t end
-            end
-        end
-        return oldIdx(self, key)
-    end))
-
-    Hooks.nc = oldNC
-    Hooks.idx = oldIdx
-    warn("[@kotyk_software] AGGRESSIVE MODE — риск кика!")
-end
-
-local function stopAggressive()
-    if Hooks.nc then
-        hookmetamethod(game, "__namecall", Hooks.nc); Hooks.nc = nil
-    end
-    if Hooks.idx then
-        hookmetamethod(game, "__index", Hooks.idx); Hooks.idx = nil
-    end
-    print("[@kotyk_software] Aggressive mode OFF")
-end
-
-RunService.Heartbeat:Connect(function()
-    if Settings.AggressiveMode and not Hooks.nc then
-        startAggressive()
-    elseif not Settings.AggressiveMode and Hooks.nc then
-        stopAggressive()
+    -- AIMBOT — плавный доворот камеры
+    if target then
+        local targetCF = CFrame.new(Camera.CFrame.Position, target.Position)
+        Camera.CFrame = Camera.CFrame:Lerp(targetCF, Settings.Smoothness / 100)
     end
 end)
 
 --==========================================================
 --          UI
 --==========================================================
-local MainTab = Window:CreateTab("Aimbot", 4483362458)
-local VisTab  = Window:CreateTab("Visuals", 4483362458)
+local MainTab   = Window:CreateTab("Aimbot", 4483362458)
+local VisTab    = Window:CreateTab("Visuals", 4483362458)
 local ConfigTab = Window:CreateTab("Config", 4483362458)
 
 MainTab:CreateSection("Aimbot")
@@ -358,13 +272,16 @@ MainTab:CreateToggle({
 })
 
 MainTab:CreateKeybind({
-    Name = "Hold Key (empty = always on)",
+    Name = "Hold Key (пусто = всегда вкл)",
     CurrentKeybind = "",
     HoldToInteract = true,
     Flag = "HoldKey",
     Callback = function(k)
-        if k == "" then Settings.HoldKey = nil
-        else Settings.HoldKey = Enum.KeyCode[k] or nil end
+        if k == "" then
+            Settings.HoldKey = nil
+        else
+            pcall(function() Settings.HoldKey = Enum.KeyCode[k] end)
+        end
     end
 })
 
@@ -393,7 +310,7 @@ MainTab:CreateSlider({
     Name = "Max Distance",
     Range = {50, 2000},
     Increment = 10,
-    Suffix = "studs",
+    Suffix = " studs",
     CurrentValue = 500,
     Flag = "MaxDistance",
     Callback = function(v) Settings.MaxDistance = v end
@@ -406,7 +323,7 @@ MainTab:CreateSlider({
     Suffix = "%",
     CurrentValue = 25,
     Flag = "Smoothness",
-    Callback = function(v) Settings.Smoothness = v / 100 end
+    Callback = function(v) Settings.Smoothness = v end
 })
 
 MainTab:CreateToggle({
@@ -423,25 +340,6 @@ MainTab:CreateToggle({
     Callback = function(v) Settings.WallCheck = v end
 })
 
-MainTab:CreateSection("⚠️ AGGRESSIVE (может кикнуть)")
-
-MainTab:CreateToggle({
-    Name = "Silent Aim Hooks (РИСК БАНА)",
-    CurrentValue = false,
-    Flag = "Aggressive",
-    Callback = function(v)
-        Settings.AggressiveMode = v
-        if v then
-            Rayfield:Notify({
-                Title = "@kotyk_software",
-                Content = "⚠️ Агрессивный режим! Античит может кикнуть.",
-                Duration = 5
-            })
-        end
-    end
-})
-
--- VISUALS
 VisTab:CreateToggle({
     Name = "Show FOV Circle",
     CurrentValue = false,
@@ -456,7 +354,6 @@ VisTab:CreateToggle({
     Callback = function(v) Settings.ShowTarget = v end
 })
 
--- CONFIG
 ConfigTab:CreateButton({
     Name = "Save Config",
     Callback = function()
@@ -476,8 +373,8 @@ ConfigTab:CreateButton({
 --==========================================================
 Rayfield:Notify({
     Title = "@kotyk_software",
-    Content = "Aimbot загружен! Safe mode активен.",
+    Content = "Aimbot загружен. Без хуков — античит не тронет.",
     Duration = 5
 })
 
-print("[@kotyk_software] Loaded. Safe aimbot active, aggressive mode available.")
+print("[@kotyk_software] Loaded. NO hooks. Safe camera aimbot only.")
