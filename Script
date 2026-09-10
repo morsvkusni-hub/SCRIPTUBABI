@@ -1,17 +1,17 @@
 --[[
-    @kotyk_prostoy | DeagleArena Rebrand
-    Original: vita8it/DeagleArena
+    @kotyk_prostoy | Aimbot + ESP + Movement
     Key: @kotyk_prostoy
+    Telegram: t.me/kotyk_software
 ]]
 
 local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
 local LP = Players.LocalPlayer
 
 --==========================================================
---          KEY SYSTEM
+--          KEY SYSTEM (в стиле меню)
 --==========================================================
 local VALID_KEY = "@kotyk_prostoy"
+local TG_LINK = "t.me/kotyk_software"
 
 local function keyCheck()
     local PG = LP:WaitForChild("PlayerGui")
@@ -21,94 +21,192 @@ local function keyCheck()
     kgui.Parent = PG
     kgui.DisplayOrder = 999
 
+    -- затемнение фона
+    local shade = Instance.new("Frame")
+    shade.Size = UDim2.new(1, 0, 1, 0)
+    shade.BackgroundColor3 = Color3.new(0, 0, 0)
+    shade.BackgroundTransparency = 0.4
+    shade.BorderSizePixel = 0
+    shade.Parent = kgui
+
+    -- основное окно
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(0, 360, 0, 220)
-    bg.Position = UDim2.new(0.5, -180, 0.5, -110)
-    bg.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+    bg.Size = UDim2.new(0, 380, 0, 260)
+    bg.Position = UDim2.new(0.5, -190, 0.5, -130)
+    bg.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
     bg.BorderSizePixel = 0
     bg.Parent = kgui
-    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 12)
-    local stroke = Instance.new("UIStroke", bg)
-    stroke.Color = Color3.fromRGB(255, 90, 90)
-    stroke.Thickness = 1.5
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 14)
 
+    local bgStroke = Instance.new("UIStroke", bg)
+    bgStroke.Color = Color3.fromRGB(45, 45, 55)
+    bgStroke.Thickness = 1.5
+    bgStroke.Transparency = 0.2
+
+    -- градиент на фоне
+    local grad = Instance.new("UIGradient", bg)
+    grad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 32)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 16)),
+    })
+    grad.Rotation = 90
+
+    -- верхняя полоса акцента
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, -40, 0, 3)
+    topBar.Position = UDim2.new(0, 20, 0, 0)
+    topBar.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
+    topBar.BorderSizePixel = 0
+    topBar.Parent = bg
+    Instance.new("UICorner", topBar).CornerRadius = UDim.new(1, 0)
+
+    -- заголовок
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 42)
+    title.Size = UDim2.new(1, -40, 0, 34)
+    title.Position = UDim2.new(0, 20, 0, 16)
     title.BackgroundTransparency = 1
     title.Text = "@kotyk_prostoy"
-    title.TextColor3 = Color3.fromRGB(255, 90, 90)
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 22
     title.Font = Enum.Font.GothamBold
+    title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = bg
 
+    -- подзаголовок
     local sub = Instance.new("TextLabel")
-    sub.Size = UDim2.new(1, 0, 0, 16)
-    sub.Position = UDim2.new(0, 0, 0, 40)
+    sub.Size = UDim2.new(1, -40, 0, 16)
+    sub.Position = UDim2.new(0, 20, 0, 50)
     sub.BackgroundTransparency = 1
-    sub.Text = "Введите ключ для доступа"
-    sub.TextColor3 = Color3.fromRGB(150, 150, 160)
-    sub.TextSize = 11
-    sub.Font = Enum.Font.Gotham
+    sub.Text = "Enter license key to continue"
+    sub.TextColor3 = Color3.fromRGB(140, 140, 150)
+    sub.TextSize = 12
+    sub.Font = Enum.Font.GothamMedium
+    sub.TextXAlignment = Enum.TextXAlignment.Left
     sub.Parent = bg
 
+    -- разделитель
+    local divider = Instance.new("Frame")
+    divider.Size = UDim2.new(1, -40, 0, 1)
+    divider.Position = UDim2.new(0, 20, 0, 74)
+    divider.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    divider.BorderSizePixel = 0
+    divider.Parent = bg
+
+    -- поле ввода
+    local boxFrame = Instance.new("Frame")
+    boxFrame.Size = UDim2.new(1, -40, 0, 42)
+    boxFrame.Position = UDim2.new(0, 20, 0, 90)
+    boxFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    boxFrame.BorderSizePixel = 0
+    boxFrame.Parent = bg
+    Instance.new("UICorner", boxFrame).CornerRadius = UDim.new(0, 8)
+    local boxStroke = Instance.new("UIStroke", boxFrame)
+    boxStroke.Color = Color3.fromRGB(45, 45, 55)
+    boxStroke.Thickness = 1
+
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -40, 0, 38)
-    box.Position = UDim2.new(0, 20, 0, 66)
-    box.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
-    box.BorderSizePixel = 0
+    box.Size = UDim2.new(1, -24, 1, 0)
+    box.Position = UDim2.new(0, 12, 0, 0)
+    box.BackgroundTransparency = 1
     box.PlaceholderText = "Key..."
     box.Text = ""
     box.TextColor3 = Color3.fromRGB(230, 230, 235)
-    box.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
+    box.PlaceholderColor3 = Color3.fromRGB(90, 90, 100)
     box.TextSize = 14
     box.Font = Enum.Font.GothamMedium
+    box.TextXAlignment = Enum.TextXAlignment.Left
     box.ClearTextOnFocus = false
-    box.Parent = bg
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
+    box.Parent = boxFrame
 
+    -- кнопка Submit
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -40, 0, 38)
-    btn.Position = UDim2.new(0, 20, 0, 112)
+    btn.Size = UDim2.new(1, -40, 0, 42)
+    btn.Position = UDim2.new(0, 20, 0, 142)
     btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
     btn.Text = "Submit"
     btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextSize = 14
+    btn.TextSize = 15
     btn.Font = Enum.Font.GothamBold
     btn.Parent = bg
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 
+    -- hover эффект на кнопке
+    btn.MouseEnter:Connect(function()
+        TweenService_Hover(btn, Color3.fromRGB(255, 110, 110))
+    end)
+    btn.MouseLeave:Connect(function()
+        TweenService_Hover(btn, Color3.fromRGB(255, 90, 90))
+    end)
+
+    -- статус
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -20, 0, 20)
-    status.Position = UDim2.new(0, 10, 0, 158)
+    status.Size = UDim2.new(1, -40, 0, 18)
+    status.Position = UDim2.new(0, 20, 0, 190)
     status.BackgroundTransparency = 1
     status.Text = ""
     status.TextColor3 = Color3.fromRGB(255, 90, 90)
     status.TextSize = 12
     status.Font = Enum.Font.GothamMedium
+    status.TextXAlignment = Enum.TextXAlignment.Left
     status.Parent = bg
 
-    local footer = Instance.new("TextLabel")
-    footer.Size = UDim2.new(1, 0, 0, 16)
-    footer.Position = UDim2.new(0, 0, 1, -22)
-    footer.BackgroundTransparency = 1
-    footer.Text = "Купить ключ у @kotyk_prostoy"
-    footer.TextColor3 = Color3.fromRGB(120, 120, 130)
-    footer.TextSize = 11
-    footer.Font = Enum.Font.Gotham
-    footer.Parent = bg
+    -- футер с телеграмом
+    local footerBtn = Instance.new("TextButton")
+    footerBtn.Size = UDim2.new(1, -40, 0, 20)
+    footerBtn.Position = UDim2.new(0, 20, 1, -30)
+    footerBtn.BackgroundTransparency = 1
+    footerBtn.Text = "My Telegram  •  " .. TG_LINK
+    footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
+    footerBtn.TextSize = 12
+    footerBtn.Font = Enum.Font.GothamMedium
+    footerBtn.TextXAlignment = Enum.TextXAlignment.Left
+    footerBtn.Parent = bg
+
+    footerBtn.MouseEnter:Connect(function()
+        footerBtn.TextColor3 = Color3.fromRGB(90, 170, 255)
+    end)
+    footerBtn.MouseLeave:Connect(function()
+        footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
+    end)
+
+    footerBtn.MouseButton1Click:Connect(function()
+        if setclipboard then
+            pcall(setclipboard, "https://" .. TG_LINK)
+            footerBtn.Text = "Copied! ✓"
+            footerBtn.TextColor3 = Color3.fromRGB(80, 200, 120)
+            task.wait(1.5)
+            footerBtn.Text = "My Telegram  •  " .. TG_LINK
+            footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
+        end
+    end)
+
+    -- анимация кнопки
+    local TweenService = game:GetService("TweenService")
+    function TweenService_Hover(obj, color)
+        local tween = TweenService:Create(obj, TweenInfo.new(0.15), {
+            BackgroundColor3 = color
+        })
+        tween:Play()
+    end
 
     local done = false
     local function try()
         if box.Text == VALID_KEY then
             done = true
-            status.Text = "Access granted!"
+            status.Text = "Access granted ✓"
             status.TextColor3 = Color3.fromRGB(80, 200, 120)
-            task.wait(0.4)
+            boxStroke.Color = Color3.fromRGB(80, 200, 120)
+            task.wait(0.5)
             if kgui and kgui.Parent then kgui:Destroy() end
         else
-            status.Text = "Неверный ключ!"
+            status.Text = "Invalid key. Get it from " .. TG_LINK
             status.TextColor3 = Color3.fromRGB(255, 90, 90)
+            boxStroke.Color = Color3.fromRGB(255, 90, 90)
             box.Text = ""
+            task.wait(1)
+            if boxStroke then
+                boxStroke.Color = Color3.fromRGB(45, 45, 55)
+            end
         end
     end
     btn.MouseButton1Click:Connect(try)
@@ -121,171 +219,700 @@ end
 if not keyCheck() then return end
 
 --==========================================================
---          REBRAND HOOK (подмена заголовка окна)
+--          LOAD PACKAGE
 --==========================================================
-local oldHttpGet = game.HttpGet
-local patched = false
+local _ENV = (getgenv or getrenv or getfenv)()
 
--- Перехват DescendantAdded, чтобы заменить текст в заголовке
-local PG = LP:WaitForChild("PlayerGui")
-PG.DescendantAdded:Connect(function(obj)
-    if patched then return end
-    if obj:IsA("TextLabel") or obj:IsA("TextButton") then
-        task.defer(function()
-            local t = obj.Text
-            if t and (t:find("vita8it") or t:find("Deagle") or t:find("Aimbot + ESP")) then
-                obj.Text = t:gsub("vita8it", "@kotyk_prostoy")
-                              :gsub("DeagleArena", "@kotyk_prostoy Hub")
-                              :gsub("Made by", "by")
-                patched = true
-            end
-        end)
-    end
-end)
+local Module, Settings = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/vita8it/Opengame/main/utils/package.luau"
+))()
 
---==========================================================
---          CONFIG SYSTEM
---==========================================================
-local CONFIG_FOLDER = "kotyk_prostoy"
-local CONFIG_FILE = "deagle_config.json"
+local Queue = Module.GoodQueue:Create()
+local Plugins = Module.Plugins
+local Connections = Module.Connections
 
-local function ensureFolder()
-    if isfolder and not isfolder(CONFIG_FOLDER) then
-        pcall(makefolder, CONFIG_FOLDER)
-    end
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local PreviousESP = _ENV.NextESP
+if PreviousESP and PreviousESP.Clear then
+    PreviousESP:Clear()
 end
 
-local function saveConfig(data)
-    ensureFolder()
-    if writefile then
-        pcall(writefile, CONFIG_FOLDER .. "/" .. CONFIG_FILE, HttpService:JSONEncode(data))
-        return true
-    end
-    return false
-end
-
-local function loadConfig()
-    ensureFolder()
-    if isfile and isfile(CONFIG_FOLDER .. "/" .. CONFIG_FILE) then
-        local ok, content = pcall(readfile, CONFIG_FOLDER .. "/" .. CONFIG_FILE)
-        if ok and content then
-            local ok2, data = pcall(HttpService.JSONDecode, HttpService, content)
-            if ok2 then return data end
+local Folder = gethui and gethui()
+if Folder then
+    for Index, Value in Folder:GetChildren() do
+        if Value.Name:find("Next.js") then
+            Value:Destroy()
         end
     end
-    return nil
 end
 
 --==========================================================
---          CONFIG UI (отдельное маленькое окно)
+--          AIMBOT MODULE
 --==========================================================
-local ConfigGui = Instance.new("ScreenGui")
-ConfigGui.Name = "kotyk_configs"
-ConfigGui.ResetOnSpawn = false
-ConfigGui.Parent = PG
+Module:CreateModule("Aimbot", function(Module)
+    local Aimbot = {}
+    local Shared = ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Shared")
+    local DeagleShared = require(Shared:WaitForChild("DeagleShared"))
+    local CachedTarget = nil
 
-local cfgBtn = Instance.new("TextButton")
-cfgBtn.Size = UDim2.new(0, 100, 0, 32)
-cfgBtn.Position = UDim2.new(0, 20, 0.5, -16)
-cfgBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
-cfgBtn.Text = "⚙ Configs"
-cfgBtn.TextColor3 = Color3.fromRGB(230, 230, 235)
-cfgBtn.TextSize = 13
-cfgBtn.Font = Enum.Font.GothamBold
-cfgBtn.Parent = ConfigGui
-Instance.new("UICorner", cfgBtn).CornerRadius = UDim.new(0, 6)
-Instance.new("UIStroke", cfgBtn).Color = Color3.fromRGB(255, 90, 90)
+    if not _ENV.NextOriginalRaycast then
+        _ENV.NextOriginalRaycast = DeagleShared.Raycast
+    end
 
-local cfgPanel = Instance.new("Frame")
-cfgPanel.Size = UDim2.new(0, 240, 0, 260)
-cfgPanel.Position = UDim2.new(0, 130, 0.5, -130)
-cfgPanel.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-cfgPanel.BorderSizePixel = 0
-cfgPanel.Visible = false
-cfgPanel.Parent = ConfigGui
-Instance.new("UICorner", cfgPanel).CornerRadius = UDim.new(0, 10)
-Instance.new("UIStroke", cfgPanel).Color = Color3.fromRGB(255, 90, 90)
+    function Aimbot:IsAlive(Character)
+        if not Character or not Character.Parent then return false end
+        if Character:GetAttribute("Alive") == false then return false end
+        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+        if not Humanoid or Humanoid.Health <= 0 then return false end
+        return true
+    end
 
-local cfgTitle = Instance.new("TextLabel")
-cfgTitle.Size = UDim2.new(1, 0, 0, 34)
-cfgTitle.BackgroundTransparency = 1
-cfgTitle.Text = "@kotyk_prostoy | Configs"
-cfgTitle.TextColor3 = Color3.fromRGB(255, 90, 90)
-cfgTitle.TextSize = 13
-cfgTitle.Font = Enum.Font.GothamBold
-cfgTitle.Parent = cfgPanel
+    function Aimbot:IsEnemy(Player)
+        if not Settings.CheckTeam then return true end
+        local LocalTeam = LocalPlayer.Team
+        if not LocalTeam or Player.Neutral or LocalPlayer.Neutral then return true end
+        return Player.Team ~= LocalTeam
+    end
 
-local function cfgButton(text, y, color, callback)
-    local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, -20, 0, 34)
-    b.Position = UDim2.new(0, 10, 0, y)
-    b.BackgroundColor3 = color or Color3.fromRGB(35, 35, 42)
-    b.Text = text
-    b.TextColor3 = Color3.fromRGB(230, 230, 235)
-    b.TextSize = 13
-    b.Font = Enum.Font.GothamMedium
-    b.Parent = cfgPanel
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
-    b.MouseButton1Click:Connect(callback)
-    return b
-end
+    function Aimbot:IsValidTarget(Target)
+        local Character = Target.Character
+        local IsBot = Character and Character:GetAttribute("IsBot") == true
+        if not IsBot and Target == LocalPlayer then return false end
+        if not Character or not Character.Parent then return false end
+        if not IsBot and not self:IsEnemy(Target) then return false end
+        return self:IsAlive(Character)
+    end
 
-cfgButton("💾 Save Config", 44, Color3.fromRGB(35, 60, 45), function()
-    local data = {
-        timestamp = os.time(),
-        author = "@kotyk_prostoy",
-        -- сюда складывай настройки из UI (нужно привязывать вручную)
-        version = 1
+    function Aimbot:GetTargets()
+        local Targets = {}
+        for Index, Player in Players:GetPlayers() do
+            table.insert(Targets, Player)
+        end
+        if Settings.TargetBots then
+            for Index, Model in workspace:GetChildren() do
+                if not Model:IsA("Model") then continue end
+                if Model:GetAttribute("IsBot") ~= true then continue end
+                if Model == LocalPlayer.Character then continue end
+                table.insert(Targets, { Name = Model.Name, Character = Model })
+            end
+        end
+        return Targets
+    end
+
+    function Aimbot:GetTargetPosition(Character)
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        if not HRP then return nil end
+        local PartName = Settings.TargetPart or "HumanoidRootPart"
+        local Part = Character:FindFirstChild(PartName) or HRP
+        return Part.Position
+    end
+
+    function Aimbot:IsVisible(From, Position, Target)
+        if not Settings.CheckWall then return true end
+        local Character = LocalPlayer.Character
+        local TargetCharacter = Target and Target.Character
+        if not Character or not TargetCharacter then return false end
+        local Params = RaycastParams.new()
+        Params.FilterType = Enum.RaycastFilterType.Exclude
+        Params.FilterDescendantsInstances = { Character, TargetCharacter }
+        local Result = workspace:Raycast(From, Position - From, Params)
+        if not Result then return true end
+        return Result.Instance:IsDescendantOf(TargetCharacter)
+    end
+
+    function Aimbot:IsWithinFOV(Position)
+        local Cam = workspace.CurrentCamera
+        if not Cam then return false end
+        local Point, OnScreen = Cam:WorldToViewportPoint(Position)
+        if not OnScreen then return false end
+        local Center = Cam.ViewportSize / 2
+        return (Vector2.new(Point.X, Point.Y) - Center).Magnitude <= (Settings.FOV or 100)
+    end
+
+    function Aimbot:FindTarget(From)
+        local MaxDistance = Settings.Distance or 300
+        local TargetMode = Settings.TargetMode or "Nearest"
+        local BestTarget, BestPosition, BestDistance = nil, nil, math.huge
+
+        if CachedTarget and self:IsValidTarget(CachedTarget) then
+            local P = self:GetTargetPosition(CachedTarget.Character)
+            if P then
+                local D = (P - From).Magnitude
+                if D <= MaxDistance and self:IsVisible(From, P, CachedTarget) then
+                    BestTarget, BestPosition, BestDistance = CachedTarget, P, D
+                end
+            end
+        end
+
+        for Index, Target in self:GetTargets() do
+            if not self:IsValidTarget(Target) then continue end
+            local Position = self:GetTargetPosition(Target.Character)
+            if not Position then continue end
+            local Distance = (Position - From).Magnitude
+            if Distance > MaxDistance then continue end
+            if TargetMode == "FOV" and not self:IsWithinFOV(Position) then continue end
+            if not self:IsVisible(From, Position, Target) then continue end
+            if Distance >= BestDistance then continue end
+            BestTarget, BestPosition, BestDistance = Target, Position, Distance
+        end
+
+        if BestTarget then CachedTarget = BestTarget end
+        return BestTarget, BestPosition
+    end
+
+    function Aimbot:Enable()
+        if self.Hooked then return end
+        self.Hooked = true
+        DeagleShared.Raycast = function(Origin, From, To)
+            local Success, Target, TargetPosition = pcall(Aimbot.FindTarget, Aimbot, From)
+            if Success and Target and TargetPosition then
+                return self.OriginalRaycast(Origin, From, TargetPosition)
+            end
+            return self.OriginalRaycast(Origin, From, To)
+        end
+    end
+
+    function Aimbot:Disable()
+        if not self.Hooked then return end
+        self.Hooked = false
+        DeagleShared.Raycast = self.OriginalRaycast
+    end
+
+    Aimbot.OriginalRaycast = _ENV.NextOriginalRaycast
+    return Aimbot
+end)
+
+--==========================================================
+--          ESP MODULE
+--==========================================================
+Module:CreateModule("ESP", function(Module)
+    local ESP = {}
+    local Cached = {}
+    local ColorMap = {
+        Red = Color3.fromRGB(255, 60, 60),
+        Orange = Color3.fromRGB(255, 150, 40),
+        Yellow = Color3.fromRGB(255, 220, 60),
+        Green = Color3.fromRGB(80, 255, 100),
+        Cyan = Color3.fromRGB(60, 220, 255),
+        Blue = Color3.fromRGB(90, 130, 255),
+        Purple = Color3.fromRGB(190, 90, 255),
+        Pink = Color3.fromRGB(255, 120, 200),
     }
-    if saveConfig(data) then
-        cfgTitle.Text = "✓ Сохранено!"
-        task.wait(1)
-        cfgTitle.Text = "@kotyk_prostoy | Configs"
-    else
-        cfgTitle.Text = "✗ Ошибка сохранения"
+
+    local Circle = Drawing.new("Circle")
+    Circle.Thickness = 1
+    Circle.Filled = false
+    Circle.Visible = false
+
+    function ESP:IsAlive(Character)
+        if not Character or not Character.Parent then return false end
+        if Character:GetAttribute("Alive") == false then return false end
+        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+        if not Humanoid or Humanoid.Health <= 0 then return false end
+        return true
     end
-end)
 
-cfgButton("📂 Load Config", 84, Color3.fromRGB(35, 45, 60), function()
-    local data = loadConfig()
-    if data then
-        cfgTitle.Text = "✓ Загружено!"
-        -- применить data к UI здесь
-        task.wait(1)
-        cfgTitle.Text = "@kotyk_prostoy | Configs"
-    else
-        cfgTitle.Text = "✗ Нет конфига"
+    function ESP:IsEnemy(Player)
+        if not Settings.ESPCheckTeam then return true end
+        local LocalTeam = LocalPlayer.Team
+        if not LocalTeam or Player.Neutral or LocalPlayer.Neutral then return true end
+        return Player.Team ~= LocalTeam
     end
-end)
 
-cfgButton("🗑 Reset Config", 124, Color3.fromRGB(60, 35, 35), function()
-    if delfile then
-        pcall(delfile, CONFIG_FOLDER .. "/" .. CONFIG_FILE)
+    function ESP:IsValidTarget(Target)
+        local Character = Target.Character
+        local IsBot = Character and Character:GetAttribute("IsBot") == true
+        if not IsBot and Target == LocalPlayer then return false end
+        if not Character or not Character.Parent then return false end
+        if not IsBot and not self:IsEnemy(Target) then return false end
+        return self:IsAlive(Character)
     end
-    cfgTitle.Text = "✓ Сброшено!"
-    task.wait(1)
-    cfgTitle.Text = "@kotyk_prostoy | Configs"
-end)
 
-cfgButton("❌ Close", 200, Color3.fromRGB(40, 40, 48), function()
-    cfgPanel.Visible = false
-end)
+    function ESP:GetTargets()
+        local Targets = {}
+        for Index, Player in Players:GetPlayers() do
+            table.insert(Targets, Player)
+        end
+        if Settings.ESPTargetBots then
+            for Index, Model in workspace:GetChildren() do
+                if not Model:IsA("Model") then continue end
+                if Model:GetAttribute("IsBot") ~= true then continue end
+                if Model == LocalPlayer.Character then continue end
+                table.insert(Targets, { Name = Model.Name, Character = Model })
+            end
+        end
+        return Targets
+    end
 
-cfgBtn.MouseButton1Click:Connect(function()
-    cfgPanel.Visible = not cfgPanel.Visible
+    function ESP:GetColor()
+        return ColorMap[Settings.ESPColor or "Red"] or ColorMap.Red
+    end
+
+    function ESP:CreateSquare()
+        local Box = Drawing.new("Square")
+        Box.Thickness = 1
+        Box.Visible = false
+        return Box
+    end
+
+    function ESP:CreateText()
+        local Name = Drawing.new("Text")
+        Name.Center = true
+        Name.Outline = true
+        Name.OutlineColor = Color3.new(0, 0, 0)
+        Name.Visible = false
+        return Name
+    end
+
+    function ESP:CreateLine()
+        local Tracer = Drawing.new("Line")
+        Tracer.Thickness = 1
+        Tracer.Visible = false
+        return Tracer
+    end
+
+    function ESP:CreateData(Target)
+        return {
+            Box = ESP:CreateSquare(),
+            Outline = ESP:CreateSquare(),
+            Name = ESP:CreateText(),
+            Tracer = ESP:CreateLine(),
+        }
+    end
+
+    function ESP:HideData(Data)
+        Data.Box.Visible = false
+        Data.Outline.Visible = false
+        Data.Name.Visible = false
+        Data.Tracer.Visible = false
+    end
+
+    function ESP:Hide()
+        for Index, Data in Cached do
+            ESP:HideData(Data)
+        end
+        Circle.Visible = false
+    end
+
+    ESP.RemovePlayer = function(Player)
+        local Data = Cached[Player]
+        if not Data then return end
+        Data.Box:Remove()
+        Data.Outline:Remove()
+        Data.Name:Remove()
+        Data.Tracer:Remove()
+        Cached[Player] = nil
+    end
+
+    function ESP:UpdateBox(Box, Outline, HeadPoint, RootPoint, Opacity)
+        local Height = RootPoint.Y - HeadPoint.Y
+        if Height <= 0 then
+            Box.Visible = false
+            Outline.Visible = false
+            return
+        end
+        local Width = math.max(Height * 0.6, 4)
+        if Settings.ESPBoxOutline then
+            Outline.Filled = true
+            Outline.Position = Vector2.new(RootPoint.X - Width / 2, HeadPoint.Y) - Vector2.new(1, 1)
+            Outline.Size = Vector2.new(Width, Height) + Vector2.new(2, 2)
+            Outline.Color = Color3.new(0, 0, 0)
+            Outline.Transparency = Opacity
+            Outline.Visible = true
+        else
+            Outline.Visible = false
+        end
+        Box.Position = Vector2.new(RootPoint.X - Width / 2, HeadPoint.Y)
+        Box.Size = Vector2.new(Width, Height)
+        Box.Color = self:GetColor()
+        Box.Transparency = Opacity
+        Box.Visible = true
+    end
+
+    function ESP:UpdateName(Name, Target, HeadPoint, Distance, Opacity)
+        local Text = Target.Name
+        if Settings.ESPShowDistance then
+            Text ..= string.format(" [%dm]", math.round(Distance))
+        end
+        Name.Position = Vector2.new(HeadPoint.X, HeadPoint.Y - 16)
+        Name.Text = Text
+        Name.Color = self:GetColor()
+        Name.Size = Settings.ESPNameSize or 13
+        Name.Transparency = Opacity
+        Name.Visible = true
+    end
+
+    function ESP:UpdateTracer(Tracer, RootPoint, Opacity)
+        local Camera = workspace.CurrentCamera
+        if not Camera then return end
+        local ViewportSize = Camera.ViewportSize
+        Tracer.From = Vector2.new(ViewportSize.X / 2, ViewportSize.Y)
+        Tracer.To = Vector2.new(RootPoint.X, RootPoint.Y)
+        Tracer.Color = self:GetColor()
+        Tracer.Transparency = Opacity
+        Tracer.Visible = true
+    end
+
+    function ESP:UpdateCircle(Opacity)
+        local Camera = workspace.CurrentCamera
+        if not Camera then return end
+        Circle.Position = Camera.ViewportSize / 2
+        Circle.Radius = Settings.ESPFOV or 100
+        Circle.Color = self:GetColor()
+        Circle.Transparency = Opacity
+        Circle.Visible = true
+    end
+
+    function ESP:UpdatePlayer(Target, Camera, Opacity)
+        local Character = Target.Character
+        local IsBot = Character and Character:GetAttribute("IsBot") == true
+        local Key = IsBot and Character or Target
+        local Data = Cached[Key]
+
+        if not Data then
+            Data = ESP:CreateData(Target)
+            Cached[Key] = Data
+        end
+
+        if not self:IsValidTarget(Target) then
+            self:HideData(Data)
+            return
+        end
+
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        if not HRP then
+            self:HideData(Data)
+            return
+        end
+
+        local RootPosition = HRP.Position
+        local Distance = (RootPosition - Camera.CFrame.Position).Magnitude
+        local MaxDistance = Settings.ESPDistance or 300
+
+        if Distance > MaxDistance then
+            self:HideData(Data)
+            return
+        end
+
+        local Head = Character:FindFirstChild("Head") or HRP
+        local HeadPosition = Head.Position
+        local RootPoint, RootOnScreen = Camera:WorldToViewportPoint(RootPosition)
+        local HeadPoint, HeadOnScreen = Camera:WorldToViewportPoint(HeadPosition)
+
+        if not RootOnScreen or not HeadOnScreen then
+            self:HideData(Data)
+            return
+        end
+
+        if Settings.ESPBox then
+            self:UpdateBox(Data.Box, Data.Outline, HeadPoint, RootPoint, Opacity)
+        else
+            Data.Box.Visible = false
+        end
+
+        if Settings.ESPName then
+            self:UpdateName(Data.Name, Target, HeadPoint, Distance, Opacity)
+        else
+            Data.Name.Visible = false
+        end
+
+        if Settings.ESPTracer then
+            self:UpdateTracer(Data.Tracer, RootPoint, Opacity)
+        else
+            Data.Tracer.Visible = false
+        end
+    end
+
+    function ESP:Update()
+        if not Settings.ESP then
+            self:Hide()
+            return
+        end
+        local Camera = workspace.CurrentCamera
+        local Opacity = Settings.ESPOpacity or 1
+
+        if Settings.ESPFOVCircle then
+            self:UpdateCircle(Opacity)
+        else
+            Circle.Visible = false
+        end
+
+        if not Camera then return end
+
+        for Index, Target in self:GetTargets() do
+            self:UpdatePlayer(Target, Camera, Opacity)
+        end
+    end
+
+    function ESP:Clear()
+        for Index, Data in Cached do
+            Data.Box:Remove()
+            Data.Outline:Remove()
+            Data.Name:Remove()
+            Data.Tracer:Remove()
+        end
+        table.clear(Cached)
+        Circle:Remove()
+    end
+
+    _ENV.NextESP = ESP
+    return ESP
 end)
 
 --==========================================================
---          LOAD ORIGINAL SCRIPT
+--          MOVEMENT MODULE (Fly + Infinite Jump)
 --==========================================================
-print("[@kotyk_prostoy] Loading DeagleArena...")
+Module:CreateModule("Movement", function(Module)
+    local Movement = {}
 
-local ok, err = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/vita8it/Vibe/main/DeagleArena.luau"))()
+    local FlyConnection = nil
+    local FlyBodyVelocity = nil
+    local FlyBodyGyro = nil
+    local IJumpConnection = nil
+    local SPEED = 60
+
+    function Movement:StartFly()
+        if FlyConnection then return end
+        local Character = LocalPlayer.Character
+        if not Character then return end
+        local HRP = Character:FindFirstChild("HumanoidRootPart")
+        if not HRP then return end
+        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+        if Humanoid then Humanoid.PlatformStand = true end
+
+        FlyBodyVelocity = Instance.new("BodyVelocity")
+        FlyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        FlyBodyVelocity.Velocity = Vector3.zero
+        FlyBodyVelocity.Parent = HRP
+
+        FlyBodyGyro = Instance.new("BodyGyro")
+        FlyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        FlyBodyGyro.P = 1000
+        FlyBodyGyro.D = 50
+        FlyBodyGyro.CFrame = HRP.CFrame
+        FlyBodyGyro.Parent = HRP
+
+        FlyConnection = RunService.RenderStepped:Connect(function()
+            if not HRP or not HRP.Parent then
+                Movement:StopFly()
+                return
+            end
+            local Camera = workspace.CurrentCamera
+            if not Camera then return end
+
+            local MoveDir = Vector3.zero
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then MoveDir += Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then MoveDir -= Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then MoveDir -= Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then MoveDir += Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then MoveDir += Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then MoveDir -= Vector3.new(0, 1, 0) end
+
+            if MoveDir.Magnitude > 0 then MoveDir = MoveDir.Unit end
+
+            FlyBodyVelocity.Velocity = MoveDir * SPEED
+            FlyBodyGyro.CFrame = Camera.CFrame
+        end)
+    end
+
+    function Movement:StopFly()
+        if FlyConnection then
+            FlyConnection:Disconnect()
+            FlyConnection = nil
+        end
+        if FlyBodyVelocity then FlyBodyVelocity:Destroy(); FlyBodyVelocity = nil end
+        if FlyBodyGyro then FlyBodyGyro:Destroy(); FlyBodyGyro = nil end
+
+        local Character = LocalPlayer.Character
+        if Character then
+            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+            if Humanoid then Humanoid.PlatformStand = false end
+        end
+    end
+
+    function Movement:SetFlySpeed(Speed) SPEED = Speed end
+
+    function Movement:StartInfiniteJump()
+        if IJumpConnection then return end
+        IJumpConnection = UserInputService.JumpRequest:Connect(function()
+            local Character = LocalPlayer.Character
+            if not Character then return end
+            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+            if Humanoid then Humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end
+        end)
+    end
+
+    function Movement:StopInfiniteJump()
+        if IJumpConnection then
+            IJumpConnection:Disconnect()
+            IJumpConnection = nil
+        end
+    end
+
+    return Movement
 end)
 
-if not ok then
-    warn("[@kotyk_prostoy] Ошибка загрузки скрипта: " .. tostring(err))
-else
-    print("[@kotyk_prostoy] DeagleArena успешно загружен.")
+--==========================================================
+--          MODULE REFERENCES
+--==========================================================
+local Aimbot = Module.Aimbot
+local ESP = Module.ESP
+local Movement = Module.Movement
+
+Connections.Connect(RunService.RenderStepped, function()
+    ESP:Update()
+end)
+
+Connections.Connect(Players.PlayerRemoving, ESP.RemovePlayer)
+
+--==========================================================
+--          WINDOW
+--==========================================================
+Plugins:Window(Queue, {
+    "@kotyk_prostoy | Aimbot + ESP",
+    "by @kotyk_prostoy"
+})
+
+Plugins:Community()
+
+--==========================================================
+--          AIMBOT TAB
+--==========================================================
+local AimbotTab = Plugins:CreateTab({ "Aimbot", "Automatic aiming" }) do
+    AimbotTab:Section("Aimbot", function(Section)
+        Plugins:SetDefault("SilentAim", false)
+        Plugins:SetDefault("TargetMode", "Nearest")
+        Plugins:SetDefault("TargetPart", "HumanoidRootPart")
+        Plugins:SetDefault("Distance", 300)
+        Plugins:SetDefault("FOV", 100)
+        Plugins:SetDefault("CheckWall", true)
+        Plugins:SetDefault("CheckTeam", false)
+        Plugins:SetDefault("TargetBots", true)
+
+        Plugins:Toggle(Section, {
+            "Silent Aim",
+            "Redirect bullets to the nearest target"
+        }, "SilentAim", function(Value)
+            if Value then Aimbot:Enable() else Aimbot:Disable() end
+        end)
+
+        Plugins:Dropdown(Section, "Target Mode", {
+            "Nearest", "FOV"
+        }, "TargetMode", function(Value) end)
+
+        Plugins:Dropdown(Section, "Target Part", {
+            "Head", "HumanoidRootPart"
+        }, "TargetPart", function(Value) end)
+
+        Plugins:Slider(Section, {
+            "Distance", "Maximum distance to acquire the target"
+        }, { 50, 400, 10 }, "Distance", function(Value) end)
+
+        Plugins:Slider(Section, {
+            "FOV", "Maximum distance from the crosshair"
+        }, { 10, 300, 5 }, "FOV", function(Value) end)
+
+        Plugins:Toggle(Section, {
+            "Check Wall", "Ignore targets behind walls"
+        }, "CheckWall", function(Value) end)
+
+        Plugins:Toggle(Section, {
+            "Check Team", "Ignore same team players"
+        }, "CheckTeam", function(Value) end)
+
+        Plugins:Toggle(Section, {
+            "Target Bots", "Aim at bots with the IsBot attribute"
+        }, "TargetBots", function(Value) end)
+    end)
 end
+
+--==========================================================
+--          ESP TAB
+--==========================================================
+local ESPTab = Plugins:CreateTab({ "ESP", "See enemies" }) do
+    ESPTab:Section("ESP", function(Section)
+        Plugins:SetDefault("ESP", false)
+        Plugins:SetDefault("ESPBox", true)
+        Plugins:SetDefault("ESPName", true)
+        Plugins:SetDefault("ESPTracer", true)
+        Plugins:SetDefault("ESPBoxOutline", true)
+        Plugins:SetDefault("ESPShowDistance", true)
+        Plugins:SetDefault("ESPFOVCircle", false)
+        Plugins:SetDefault("ESPCheckTeam", false)
+        Plugins:SetDefault("ESPColor", "Red")
+        Plugins:SetDefault("ESPDistance", 300)
+        Plugins:SetDefault("ESPFOV", 100)
+        Plugins:SetDefault("ESPOpacity", 1)
+        Plugins:SetDefault("ESPNameSize", 13)
+        Plugins:SetDefault("ESPTargetBots", true)
+
+        Plugins:Toggle(Section, { "ESP", "Enable player esp" }, "ESP")
+        Plugins:Toggle(Section, { "Box", "Draw a box around the player" }, "ESPBox")
+        Plugins:Toggle(Section, { "Name", "Show the player name" }, "ESPName")
+        Plugins:Toggle(Section, { "Tracer", "Draw a line from the bottom to the player" }, "ESPTracer")
+        Plugins:Toggle(Section, { "Box Outline", "Draw an outline around the box" }, "ESPBoxOutline")
+        Plugins:Toggle(Section, { "Show Distance", "Show the distance on the name" }, "ESPShowDistance")
+        Plugins:Toggle(Section, { "FOV Circle", "Draw a circle around the crosshair" }, "ESPFOVCircle")
+        Plugins:Toggle(Section, { "Check Team", "Only show enemy team players" }, "ESPCheckTeam")
+        Plugins:Toggle(Section, { "Target Bots", "Show bots with the IsBot attribute" }, "ESPTargetBots")
+
+        Plugins:Dropdown(Section, "Color", {
+            "Red", "Orange", "Yellow", "Green",
+            "Cyan", "Blue", "Purple", "Pink"
+        }, "ESPColor", function(Value) end)
+
+        Plugins:Slider(Section, { "Distance", "Maximum distance to show the player" }, { 50, 400, 10 }, "ESPDistance")
+        Plugins:Slider(Section, { "FOV", "Radius of the fov circle" }, { 10, 300, 5 }, "ESPFOV")
+        Plugins:Slider(Section, { "Opacity", "Visibility of the drawings" }, { 0, 1, 0.05 }, "ESPOpacity")
+        Plugins:Slider(Section, { "Name Size", "Font size of the name" }, { 8, 30, 1 }, "ESPNameSize")
+    end)
+end
+
+--==========================================================
+--          MOVEMENT TAB
+--==========================================================
+local MovementTab = Plugins:CreateTab({ "Movement", "Fly and jump" }) do
+    MovementTab:Section("Fly", function(Section)
+        Plugins:SetDefault("Fly", false)
+        Plugins:SetDefault("FlySpeed", 60)
+
+        Plugins:Toggle(Section, {
+            "Fly", "WASD move, Space up, LeftCtrl down"
+        }, "Fly", function(Value)
+            if Value then
+                Movement:StartFly()
+            else
+                Movement:StopFly()
+            end
+        end)
+
+        Plugins:Slider(Section, {
+            "Fly Speed", "Speed of flight"
+        }, { 20, 300, 5 }, "FlySpeed", function(Value)
+            Movement:SetFlySpeed(Value)
+        end)
+    end)
+
+    MovementTab:Section("Jump", function(Section)
+        Plugins:SetDefault("InfiniteJump", false)
+
+        Plugins:Toggle(Section, {
+            "Infinite Jump", "Jump as many times as you want"
+        }, "InfiniteJump", function(Value)
+            if Value then
+                Movement:StartInfiniteJump()
+            else
+                Movement:StopInfiniteJump()
+            end
+        end)
+    end)
+end
+
+Plugins:Managers()
+
+print("[@kotyk_prostoy] Loaded. Telegram: t.me/kotyk_software")
