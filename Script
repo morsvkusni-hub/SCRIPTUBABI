@@ -1,27 +1,22 @@
 --[[
     @kotyk_prostoy | Aimbot + ESP + Movement
-    Key: @kotyk_prostoy
-    Telegram: t.me/kotyk_software
+    Key: @kotyk_prostoy | Telegram: t.me/kotyk_software
 ]]
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 
 --==========================================================
---          KEY SYSTEM (в стиле меню)
+--          KEY SYSTEM (стиль меню)
 --==========================================================
-local VALID_KEY = "@kotyk_prostoy"
+local VALID_KEY = "@kotyk_w_script"
 local TG_LINK = "t.me/kotyk_software"
 
 local function keyCheck()
     local PG = LP:WaitForChild("PlayerGui")
     local kgui = Instance.new("ScreenGui")
-    kgui.Name = "kotyk_key"
-    kgui.ResetOnSpawn = false
-    kgui.Parent = PG
-    kgui.DisplayOrder = 999
+    kgui.Name = "kotyk_key"; kgui.ResetOnSpawn = false; kgui.Parent = PG; kgui.DisplayOrder = 999
 
-    -- затемнение фона
     local shade = Instance.new("Frame")
     shade.Size = UDim2.new(1, 0, 1, 0)
     shade.BackgroundColor3 = Color3.new(0, 0, 0)
@@ -29,21 +24,14 @@ local function keyCheck()
     shade.BorderSizePixel = 0
     shade.Parent = kgui
 
-    -- основное окно
     local bg = Instance.new("Frame")
     bg.Size = UDim2.new(0, 380, 0, 260)
     bg.Position = UDim2.new(0.5, -190, 0.5, -130)
     bg.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
-    bg.BorderSizePixel = 0
-    bg.Parent = kgui
+    bg.BorderSizePixel = 0; bg.Parent = kgui
     Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 14)
-
     local bgStroke = Instance.new("UIStroke", bg)
-    bgStroke.Color = Color3.fromRGB(45, 45, 55)
-    bgStroke.Thickness = 1.5
-    bgStroke.Transparency = 0.2
-
-    -- градиент на фоне
+    bgStroke.Color = Color3.fromRGB(45, 45, 55); bgStroke.Thickness = 1.5; bgStroke.Transparency = 0.2
     local grad = Instance.new("UIGradient", bg)
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 32)),
@@ -51,167 +39,104 @@ local function keyCheck()
     })
     grad.Rotation = 90
 
-    -- верхняя полоса акцента
     local topBar = Instance.new("Frame")
-    topBar.Size = UDim2.new(1, -40, 0, 3)
-    topBar.Position = UDim2.new(0, 20, 0, 0)
-    topBar.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
-    topBar.BorderSizePixel = 0
+    topBar.Size = UDim2.new(1, -40, 0, 3); topBar.Position = UDim2.new(0, 20, 0, 0)
+    topBar.BackgroundColor3 = Color3.fromRGB(255, 90, 90); topBar.BorderSizePixel = 0
     topBar.Parent = bg
     Instance.new("UICorner", topBar).CornerRadius = UDim.new(1, 0)
 
-    -- заголовок
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, -40, 0, 34)
-    title.Position = UDim2.new(0, 20, 0, 16)
-    title.BackgroundTransparency = 1
-    title.Text = "@kotyk_prostoy"
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.TextSize = 22
-    title.Font = Enum.Font.GothamBold
-    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Size = UDim2.new(1, -40, 0, 34); title.Position = UDim2.new(0, 20, 0, 16)
+    title.BackgroundTransparency = 1; title.Text = "@kotyk_prostoy"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255); title.TextSize = 22
+    title.Font = Enum.Font.GothamBold; title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = bg
 
-    -- подзаголовок
     local sub = Instance.new("TextLabel")
-    sub.Size = UDim2.new(1, -40, 0, 16)
-    sub.Position = UDim2.new(0, 20, 0, 50)
-    sub.BackgroundTransparency = 1
-    sub.Text = "Enter license key to continue"
-    sub.TextColor3 = Color3.fromRGB(140, 140, 150)
-    sub.TextSize = 12
-    sub.Font = Enum.Font.GothamMedium
-    sub.TextXAlignment = Enum.TextXAlignment.Left
+    sub.Size = UDim2.new(1, -40, 0, 16); sub.Position = UDim2.new(0, 20, 0, 50)
+    sub.BackgroundTransparency = 1; sub.Text = "Enter license key to continue"
+    sub.TextColor3 = Color3.fromRGB(140, 140, 150); sub.TextSize = 12
+    sub.Font = Enum.Font.GothamMedium; sub.TextXAlignment = Enum.TextXAlignment.Left
     sub.Parent = bg
 
-    -- разделитель
     local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(1, -40, 0, 1)
-    divider.Position = UDim2.new(0, 20, 0, 74)
-    divider.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-    divider.BorderSizePixel = 0
+    divider.Size = UDim2.new(1, -40, 0, 1); divider.Position = UDim2.new(0, 20, 0, 74)
+    divider.BackgroundColor3 = Color3.fromRGB(45, 45, 55); divider.BorderSizePixel = 0
     divider.Parent = bg
 
-    -- поле ввода
     local boxFrame = Instance.new("Frame")
-    boxFrame.Size = UDim2.new(1, -40, 0, 42)
-    boxFrame.Position = UDim2.new(0, 20, 0, 90)
-    boxFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-    boxFrame.BorderSizePixel = 0
+    boxFrame.Size = UDim2.new(1, -40, 0, 42); boxFrame.Position = UDim2.new(0, 20, 0, 90)
+    boxFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 28); boxFrame.BorderSizePixel = 0
     boxFrame.Parent = bg
     Instance.new("UICorner", boxFrame).CornerRadius = UDim.new(0, 8)
     local boxStroke = Instance.new("UIStroke", boxFrame)
-    boxStroke.Color = Color3.fromRGB(45, 45, 55)
-    boxStroke.Thickness = 1
+    boxStroke.Color = Color3.fromRGB(45, 45, 55); boxStroke.Thickness = 1
 
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -24, 1, 0)
-    box.Position = UDim2.new(0, 12, 0, 0)
-    box.BackgroundTransparency = 1
-    box.PlaceholderText = "Key..."
-    box.Text = ""
-    box.TextColor3 = Color3.fromRGB(230, 230, 235)
-    box.PlaceholderColor3 = Color3.fromRGB(90, 90, 100)
-    box.TextSize = 14
-    box.Font = Enum.Font.GothamMedium
+    box.Size = UDim2.new(1, -24, 1, 0); box.Position = UDim2.new(0, 12, 0, 0)
+    box.BackgroundTransparency = 1; box.PlaceholderText = "Key..." ; box.Text = ""
+    box.TextColor3 = Color3.fromRGB(230, 230, 235); box.PlaceholderColor3 = Color3.fromRGB(90, 90, 100)
+    box.TextSize = 14; box.Font = Enum.Font.GothamMedium
     box.TextXAlignment = Enum.TextXAlignment.Left
-    box.ClearTextOnFocus = false
-    box.Parent = boxFrame
+    box.ClearTextOnFocus = false; box.Parent = boxFrame
 
-    -- кнопка Submit
+    local TweenService = game:GetService("TweenService")
+    local function tweenHover(obj, color)
+        TweenService:Create(obj, TweenInfo.new(0.15), {BackgroundColor3 = color}):Play()
+    end
+
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -40, 0, 42)
-    btn.Position = UDim2.new(0, 20, 0, 142)
-    btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
-    btn.Text = "Submit"
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.TextSize = 15
-    btn.Font = Enum.Font.GothamBold
-    btn.Parent = bg
+    btn.Size = UDim2.new(1, -40, 0, 42); btn.Position = UDim2.new(0, 20, 0, 142)
+    btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90); btn.Text = "Submit"
+    btn.TextColor3 = Color3.new(1, 1, 1); btn.TextSize = 15
+    btn.Font = Enum.Font.GothamBold; btn.Parent = bg
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 
-    -- hover эффект на кнопке
-    btn.MouseEnter:Connect(function()
-        TweenService_Hover(btn, Color3.fromRGB(255, 110, 110))
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService_Hover(btn, Color3.fromRGB(255, 90, 90))
-    end)
+    btn.MouseEnter:Connect(function() tweenHover(btn, Color3.fromRGB(255, 110, 110)) end)
+    btn.MouseLeave:Connect(function() tweenHover(btn, Color3.fromRGB(255, 90, 90)) end)
 
-    -- статус
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -40, 0, 18)
-    status.Position = UDim2.new(0, 20, 0, 190)
-    status.BackgroundTransparency = 1
-    status.Text = ""
-    status.TextColor3 = Color3.fromRGB(255, 90, 90)
-    status.TextSize = 12
-    status.Font = Enum.Font.GothamMedium
-    status.TextXAlignment = Enum.TextXAlignment.Left
+    status.Size = UDim2.new(1, -40, 0, 18); status.Position = UDim2.new(0, 20, 0, 190)
+    status.BackgroundTransparency = 1; status.Text = ""
+    status.TextColor3 = Color3.fromRGB(255, 90, 90); status.TextSize = 12
+    status.Font = Enum.Font.GothamMedium; status.TextXAlignment = Enum.TextXAlignment.Left
     status.Parent = bg
 
-    -- футер с телеграмом
     local footerBtn = Instance.new("TextButton")
-    footerBtn.Size = UDim2.new(1, -40, 0, 20)
-    footerBtn.Position = UDim2.new(0, 20, 1, -30)
-    footerBtn.BackgroundTransparency = 1
-    footerBtn.Text = "My Telegram  •  " .. TG_LINK
-    footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
-    footerBtn.TextSize = 12
-    footerBtn.Font = Enum.Font.GothamMedium
-    footerBtn.TextXAlignment = Enum.TextXAlignment.Left
+    footerBtn.Size = UDim2.new(1, -40, 0, 20); footerBtn.Position = UDim2.new(0, 20, 1, -30)
+    footerBtn.BackgroundTransparency = 1; footerBtn.Text = "My Telegram  •  " .. TG_LINK
+    footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130); footerBtn.TextSize = 12
+    footerBtn.Font = Enum.Font.GothamMedium; footerBtn.TextXAlignment = Enum.TextXAlignment.Left
     footerBtn.Parent = bg
 
-    footerBtn.MouseEnter:Connect(function()
-        footerBtn.TextColor3 = Color3.fromRGB(90, 170, 255)
-    end)
-    footerBtn.MouseLeave:Connect(function()
+    footerBtn.MouseEnter:Connect(function() footerBtn.TextColor3 = Color3.fromRGB(90, 170, 255) end)
+    footerBtn.MouseLeave:Connect(function() footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130) end)
+    footerBtn.MouseButton1Click:Connect(function()
+        pcall(setclipboard, "https://" .. TG_LINK)
+        footerBtn.Text = "Copied! ✓"; footerBtn.TextColor3 = Color3.fromRGB(80, 200, 120)
+        task.wait(1.5)
+        footerBtn.Text = "My Telegram  •  " .. TG_LINK
         footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
     end)
-
-    footerBtn.MouseButton1Click:Connect(function()
-        if setclipboard then
-            pcall(setclipboard, "https://" .. TG_LINK)
-            footerBtn.Text = "Copied! ✓"
-            footerBtn.TextColor3 = Color3.fromRGB(80, 200, 120)
-            task.wait(1.5)
-            footerBtn.Text = "My Telegram  •  " .. TG_LINK
-            footerBtn.TextColor3 = Color3.fromRGB(120, 120, 130)
-        end
-    end)
-
-    -- анимация кнопки
-    local TweenService = game:GetService("TweenService")
-    function TweenService_Hover(obj, color)
-        local tween = TweenService:Create(obj, TweenInfo.new(0.15), {
-            BackgroundColor3 = color
-        })
-        tween:Play()
-    end
 
     local done = false
     local function try()
         if box.Text == VALID_KEY then
-            done = true
-            status.Text = "Access granted ✓"
+            done = true; status.Text = "Access granted ✓"
             status.TextColor3 = Color3.fromRGB(80, 200, 120)
             boxStroke.Color = Color3.fromRGB(80, 200, 120)
-            task.wait(0.5)
-            if kgui and kgui.Parent then kgui:Destroy() end
+            task.wait(0.5); if kgui and kgui.Parent then kgui:Destroy() end
         else
             status.Text = "Invalid key. Get it from " .. TG_LINK
             status.TextColor3 = Color3.fromRGB(255, 90, 90)
             boxStroke.Color = Color3.fromRGB(255, 90, 90)
             box.Text = ""
             task.wait(1)
-            if boxStroke then
-                boxStroke.Color = Color3.fromRGB(45, 45, 55)
-            end
+            if boxStroke then boxStroke.Color = Color3.fromRGB(45, 45, 55) end
         end
     end
     btn.MouseButton1Click:Connect(try)
-    box.FocusLost:Connect(function(enter) if enter then try() end end)
-
+    box.FocusLost:Connect(function(e) if e then try() end end)
     repeat task.wait(0.1) until done or not kgui.Parent
     return done
 end
@@ -238,17 +163,46 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 local PreviousESP = _ENV.NextESP
-if PreviousESP and PreviousESP.Clear then
-    PreviousESP:Clear()
-end
+if PreviousESP and PreviousESP.Clear then PreviousESP:Clear() end
 
 local Folder = gethui and gethui()
 if Folder then
     for Index, Value in Folder:GetChildren() do
-        if Value.Name:find("Next.js") then
-            Value:Destroy()
-        end
+        if Value.Name:find("Next.js") then Value:Destroy() end
     end
+end
+
+--==========================================================
+--          OVERRIDE COMMUNITY (Telegram вместо Discord)
+--==========================================================
+function Plugins:Community()
+    local Community = self:CreateTab({
+        "Community", "Integration", 115960025411300
+    })
+
+    Community:Section("Community", function(Section)
+        Plugins:Paragraph(Section, {
+            "Welcome",
+            string.format("%s, what would you like to do today?", os.date("%d/%m/%Y")),
+        }, { "Icon", 107131709546324 })
+
+        Plugins:Paragraph(Section, {
+            "My Telegram",
+            "Join my channel: " .. TG_LINK,
+        }, { "Text", TG_LINK })
+
+        Plugins:Button(Section, {
+            "My Telegram",
+            "Copy telegram link",
+        }, function()
+            pcall(setclipboard, "https://" .. TG_LINK)
+            Plugins:Notify({
+                "Copied ✓", "Link: " .. TG_LINK, 116378866141355
+            })
+        end)
+    end)
+
+    return Community
 end
 
 --==========================================================
@@ -307,22 +261,21 @@ Module:CreateModule("Aimbot", function(Module)
     function Aimbot:GetTargetPosition(Character)
         local HRP = Character:FindFirstChild("HumanoidRootPart")
         if not HRP then return nil end
-        local PartName = Settings.TargetPart or "HumanoidRootPart"
-        local Part = Character:FindFirstChild(PartName) or HRP
+        local Part = Character:FindFirstChild(Settings.TargetPart or "HumanoidRootPart") or HRP
         return Part.Position
     end
 
     function Aimbot:IsVisible(From, Position, Target)
         if not Settings.CheckWall then return true end
         local Character = LocalPlayer.Character
-        local TargetCharacter = Target and Target.Character
-        if not Character or not TargetCharacter then return false end
+        local TC = Target and Target.Character
+        if not Character or not TC then return false end
         local Params = RaycastParams.new()
         Params.FilterType = Enum.RaycastFilterType.Exclude
-        Params.FilterDescendantsInstances = { Character, TargetCharacter }
+        Params.FilterDescendantsInstances = { Character, TC }
         local Result = workspace:Raycast(From, Position - From, Params)
         if not Result then return true end
-        return Result.Instance:IsDescendantOf(TargetCharacter)
+        return Result.Instance:IsDescendantOf(TC)
     end
 
     function Aimbot:IsWithinFOV(Position)
@@ -394,20 +347,14 @@ Module:CreateModule("ESP", function(Module)
     local ESP = {}
     local Cached = {}
     local ColorMap = {
-        Red = Color3.fromRGB(255, 60, 60),
-        Orange = Color3.fromRGB(255, 150, 40),
-        Yellow = Color3.fromRGB(255, 220, 60),
-        Green = Color3.fromRGB(80, 255, 100),
-        Cyan = Color3.fromRGB(60, 220, 255),
-        Blue = Color3.fromRGB(90, 130, 255),
-        Purple = Color3.fromRGB(190, 90, 255),
-        Pink = Color3.fromRGB(255, 120, 200),
+        Red = Color3.fromRGB(255, 60, 60), Orange = Color3.fromRGB(255, 150, 40),
+        Yellow = Color3.fromRGB(255, 220, 60), Green = Color3.fromRGB(80, 255, 100),
+        Cyan = Color3.fromRGB(60, 220, 255), Blue = Color3.fromRGB(90, 130, 255),
+        Purple = Color3.fromRGB(190, 90, 255), Pink = Color3.fromRGB(255, 120, 200),
     }
 
     local Circle = Drawing.new("Circle")
-    Circle.Thickness = 1
-    Circle.Filled = false
-    Circle.Visible = false
+    Circle.Thickness = 1; Circle.Filled = false; Circle.Visible = false
 
     function ESP:IsAlive(Character)
         if not Character or not Character.Parent then return false end
@@ -435,9 +382,7 @@ Module:CreateModule("ESP", function(Module)
 
     function ESP:GetTargets()
         local Targets = {}
-        for Index, Player in Players:GetPlayers() do
-            table.insert(Targets, Player)
-        end
+        for Index, Player in Players:GetPlayers() do table.insert(Targets, Player) end
         if Settings.ESPTargetBots then
             for Index, Model in workspace:GetChildren() do
                 if not Model:IsA("Model") then continue end
@@ -449,215 +394,113 @@ Module:CreateModule("ESP", function(Module)
         return Targets
     end
 
-    function ESP:GetColor()
-        return ColorMap[Settings.ESPColor or "Red"] or ColorMap.Red
-    end
+    function ESP:GetColor() return ColorMap[Settings.ESPColor or "Red"] or ColorMap.Red end
 
     function ESP:CreateSquare()
-        local Box = Drawing.new("Square")
-        Box.Thickness = 1
-        Box.Visible = false
-        return Box
+        local b = Drawing.new("Square"); b.Thickness = 1; b.Visible = false; return b
     end
-
     function ESP:CreateText()
-        local Name = Drawing.new("Text")
-        Name.Center = true
-        Name.Outline = true
-        Name.OutlineColor = Color3.new(0, 0, 0)
-        Name.Visible = false
-        return Name
+        local t = Drawing.new("Text"); t.Center = true; t.Outline = true
+        t.OutlineColor = Color3.new(0, 0, 0); t.Visible = false; return t
     end
-
     function ESP:CreateLine()
-        local Tracer = Drawing.new("Line")
-        Tracer.Thickness = 1
-        Tracer.Visible = false
-        return Tracer
+        local l = Drawing.new("Line"); l.Thickness = 1; l.Visible = false; return l
     end
-
-    function ESP:CreateData(Target)
+    function ESP:CreateData()
         return {
-            Box = ESP:CreateSquare(),
-            Outline = ESP:CreateSquare(),
-            Name = ESP:CreateText(),
-            Tracer = ESP:CreateLine(),
+            Box = ESP:CreateSquare(), Outline = ESP:CreateSquare(),
+            Name = ESP:CreateText(), Tracer = ESP:CreateLine(),
         }
     end
-
     function ESP:HideData(Data)
-        Data.Box.Visible = false
-        Data.Outline.Visible = false
-        Data.Name.Visible = false
-        Data.Tracer.Visible = false
+        Data.Box.Visible = false; Data.Outline.Visible = false
+        Data.Name.Visible = false; Data.Tracer.Visible = false
     end
-
     function ESP:Hide()
-        for Index, Data in Cached do
-            ESP:HideData(Data)
-        end
+        for I, D in Cached do ESP:HideData(D) end
         Circle.Visible = false
     end
-
     ESP.RemovePlayer = function(Player)
-        local Data = Cached[Player]
-        if not Data then return end
-        Data.Box:Remove()
-        Data.Outline:Remove()
-        Data.Name:Remove()
-        Data.Tracer:Remove()
+        local Data = Cached[Player]; if not Data then return end
+        Data.Box:Remove(); Data.Outline:Remove()
+        Data.Name:Remove(); Data.Tracer:Remove()
         Cached[Player] = nil
     end
 
     function ESP:UpdateBox(Box, Outline, HeadPoint, RootPoint, Opacity)
-        local Height = RootPoint.Y - HeadPoint.Y
-        if Height <= 0 then
-            Box.Visible = false
-            Outline.Visible = false
-            return
-        end
-        local Width = math.max(Height * 0.6, 4)
+        local H = RootPoint.Y - HeadPoint.Y
+        if H <= 0 then Box.Visible = false; Outline.Visible = false; return end
+        local W = math.max(H * 0.6, 4)
         if Settings.ESPBoxOutline then
             Outline.Filled = true
-            Outline.Position = Vector2.new(RootPoint.X - Width / 2, HeadPoint.Y) - Vector2.new(1, 1)
-            Outline.Size = Vector2.new(Width, Height) + Vector2.new(2, 2)
-            Outline.Color = Color3.new(0, 0, 0)
-            Outline.Transparency = Opacity
+            Outline.Position = Vector2.new(RootPoint.X - W/2, HeadPoint.Y) - Vector2.new(1, 1)
+            Outline.Size = Vector2.new(W, H) + Vector2.new(2, 2)
+            Outline.Color = Color3.new(0, 0, 0); Outline.Transparency = Opacity
             Outline.Visible = true
-        else
-            Outline.Visible = false
-        end
-        Box.Position = Vector2.new(RootPoint.X - Width / 2, HeadPoint.Y)
-        Box.Size = Vector2.new(Width, Height)
-        Box.Color = self:GetColor()
-        Box.Transparency = Opacity
-        Box.Visible = true
+        else Outline.Visible = false end
+        Box.Position = Vector2.new(RootPoint.X - W/2, HeadPoint.Y)
+        Box.Size = Vector2.new(W, H); Box.Color = self:GetColor()
+        Box.Transparency = Opacity; Box.Visible = true
     end
 
     function ESP:UpdateName(Name, Target, HeadPoint, Distance, Opacity)
         local Text = Target.Name
-        if Settings.ESPShowDistance then
-            Text ..= string.format(" [%dm]", math.round(Distance))
-        end
-        Name.Position = Vector2.new(HeadPoint.X, HeadPoint.Y - 16)
-        Name.Text = Text
-        Name.Color = self:GetColor()
-        Name.Size = Settings.ESPNameSize or 13
-        Name.Transparency = Opacity
-        Name.Visible = true
+        if Settings.ESPShowDistance then Text ..= string.format(" [%dm]", math.round(Distance)) end
+        Name.Position = Vector2.new(HeadPoint.X, HeadPoint.Y - 16); Name.Text = Text
+        Name.Color = self:GetColor(); Name.Size = Settings.ESPNameSize or 13
+        Name.Transparency = Opacity; Name.Visible = true
     end
 
     function ESP:UpdateTracer(Tracer, RootPoint, Opacity)
-        local Camera = workspace.CurrentCamera
-        if not Camera then return end
-        local ViewportSize = Camera.ViewportSize
-        Tracer.From = Vector2.new(ViewportSize.X / 2, ViewportSize.Y)
+        local Cam = workspace.CurrentCamera; if not Cam then return end
+        Tracer.From = Vector2.new(Cam.ViewportSize.X/2, Cam.ViewportSize.Y)
         Tracer.To = Vector2.new(RootPoint.X, RootPoint.Y)
-        Tracer.Color = self:GetColor()
-        Tracer.Transparency = Opacity
-        Tracer.Visible = true
+        Tracer.Color = self:GetColor(); Tracer.Transparency = Opacity; Tracer.Visible = true
     end
 
     function ESP:UpdateCircle(Opacity)
-        local Camera = workspace.CurrentCamera
-        if not Camera then return end
-        Circle.Position = Camera.ViewportSize / 2
-        Circle.Radius = Settings.ESPFOV or 100
-        Circle.Color = self:GetColor()
-        Circle.Transparency = Opacity
-        Circle.Visible = true
+        local Cam = workspace.CurrentCamera; if not Cam then return end
+        Circle.Position = Cam.ViewportSize / 2; Circle.Radius = Settings.ESPFOV or 100
+        Circle.Color = self:GetColor(); Circle.Transparency = Opacity; Circle.Visible = true
     end
 
-    function ESP:UpdatePlayer(Target, Camera, Opacity)
+    function ESP:UpdatePlayer(Target, Cam, Opacity)
         local Character = Target.Character
         local IsBot = Character and Character:GetAttribute("IsBot") == true
         local Key = IsBot and Character or Target
         local Data = Cached[Key]
-
-        if not Data then
-            Data = ESP:CreateData(Target)
-            Cached[Key] = Data
-        end
-
-        if not self:IsValidTarget(Target) then
-            self:HideData(Data)
-            return
-        end
-
+        if not Data then Data = ESP:CreateData(); Cached[Key] = Data end
+        if not self:IsValidTarget(Target) then self:HideData(Data); return end
         local HRP = Character:FindFirstChild("HumanoidRootPart")
-        if not HRP then
-            self:HideData(Data)
-            return
-        end
-
-        local RootPosition = HRP.Position
-        local Distance = (RootPosition - Camera.CFrame.Position).Magnitude
-        local MaxDistance = Settings.ESPDistance or 300
-
-        if Distance > MaxDistance then
-            self:HideData(Data)
-            return
-        end
-
+        if not HRP then self:HideData(Data); return end
+        local Dist = (HRP.Position - Cam.CFrame.Position).Magnitude
+        if Dist > (Settings.ESPDistance or 300) then self:HideData(Data); return end
         local Head = Character:FindFirstChild("Head") or HRP
-        local HeadPosition = Head.Position
-        local RootPoint, RootOnScreen = Camera:WorldToViewportPoint(RootPosition)
-        local HeadPoint, HeadOnScreen = Camera:WorldToViewportPoint(HeadPosition)
-
-        if not RootOnScreen or not HeadOnScreen then
-            self:HideData(Data)
-            return
-        end
-
-        if Settings.ESPBox then
-            self:UpdateBox(Data.Box, Data.Outline, HeadPoint, RootPoint, Opacity)
-        else
-            Data.Box.Visible = false
-        end
-
-        if Settings.ESPName then
-            self:UpdateName(Data.Name, Target, HeadPoint, Distance, Opacity)
-        else
-            Data.Name.Visible = false
-        end
-
-        if Settings.ESPTracer then
-            self:UpdateTracer(Data.Tracer, RootPoint, Opacity)
-        else
-            Data.Tracer.Visible = false
-        end
+        local RP, RO = Cam:WorldToViewportPoint(HRP.Position)
+        local HP, HO = Cam:WorldToViewportPoint(Head.Position)
+        if not RO or not HO then self:HideData(Data); return end
+        if Settings.ESPBox then self:UpdateBox(Data.Box, Data.Outline, HP, RP, Opacity)
+        else Data.Box.Visible = false end
+        if Settings.ESPName then self:UpdateName(Data.Name, Target, HP, Dist, Opacity)
+        else Data.Name.Visible = false end
+        if Settings.ESPTracer then self:UpdateTracer(Data.Tracer, RP, Opacity)
+        else Data.Tracer.Visible = false end
     end
 
     function ESP:Update()
-        if not Settings.ESP then
-            self:Hide()
-            return
-        end
-        local Camera = workspace.CurrentCamera
-        local Opacity = Settings.ESPOpacity or 1
-
-        if Settings.ESPFOVCircle then
-            self:UpdateCircle(Opacity)
-        else
-            Circle.Visible = false
-        end
-
-        if not Camera then return end
-
-        for Index, Target in self:GetTargets() do
-            self:UpdatePlayer(Target, Camera, Opacity)
-        end
+        if not Settings.ESP then self:Hide(); return end
+        local Cam = workspace.CurrentCamera
+        local Op = Settings.ESPOpacity or 1
+        if Settings.ESPFOVCircle then self:UpdateCircle(Op) else Circle.Visible = false end
+        if not Cam then return end
+        for I, T in self:GetTargets() do self:UpdatePlayer(T, Cam, Op) end
     end
 
     function ESP:Clear()
-        for Index, Data in Cached do
-            Data.Box:Remove()
-            Data.Outline:Remove()
-            Data.Name:Remove()
-            Data.Tracer:Remove()
+        for I, D in Cached do
+            D.Box:Remove(); D.Outline:Remove(); D.Name:Remove(); D.Tracer:Remove()
         end
-        table.clear(Cached)
-        Circle:Remove()
+        table.clear(Cached); Circle:Remove()
     end
 
     _ENV.NextESP = ESP
@@ -665,109 +508,121 @@ Module:CreateModule("ESP", function(Module)
 end)
 
 --==========================================================
---          MOVEMENT MODULE (Fly + Infinite Jump)
+--          MOVEMENT MODULE (Fly + IJ + Spin Bot + Third Person)
 --==========================================================
 Module:CreateModule("Movement", function(Module)
     local Movement = {}
-
-    local FlyConnection = nil
-    local FlyBodyVelocity = nil
-    local FlyBodyGyro = nil
-    local IJumpConnection = nil
+    local FlyConn, FlyBV, FlyBG, IJumpConn = nil, nil, nil, nil
+    local SpinConn, SpinSpeed = nil, 15
     local SPEED = 60
+    local TPS = nil
 
     function Movement:StartFly()
-        if FlyConnection then return end
-        local Character = LocalPlayer.Character
-        if not Character then return end
-        local HRP = Character:FindFirstChild("HumanoidRootPart")
-        if not HRP then return end
-        local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-        if Humanoid then Humanoid.PlatformStand = true end
+        if FlyConn then return end
+        local Char = LocalPlayer.Character; if not Char then return end
+        local HRP = Char:FindFirstChild("HumanoidRootPart"); if not HRP then return end
+        local Hum = Char:FindFirstChildOfClass("Humanoid")
+        if Hum then Hum.PlatformStand = true end
 
-        FlyBodyVelocity = Instance.new("BodyVelocity")
-        FlyBodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        FlyBodyVelocity.Velocity = Vector3.zero
-        FlyBodyVelocity.Parent = HRP
+        FlyBV = Instance.new("BodyVelocity")
+        FlyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        FlyBV.Velocity = Vector3.zero; FlyBV.Parent = HRP
 
-        FlyBodyGyro = Instance.new("BodyGyro")
-        FlyBodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        FlyBodyGyro.P = 1000
-        FlyBodyGyro.D = 50
-        FlyBodyGyro.CFrame = HRP.CFrame
-        FlyBodyGyro.Parent = HRP
+        FlyBG = Instance.new("BodyGyro")
+        FlyBG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+        FlyBG.P = 1000; FlyBG.D = 50
+        FlyBG.CFrame = HRP.CFrame; FlyBG.Parent = HRP
 
-        FlyConnection = RunService.RenderStepped:Connect(function()
-            if not HRP or not HRP.Parent then
-                Movement:StopFly()
-                return
-            end
-            local Camera = workspace.CurrentCamera
-            if not Camera then return end
-
-            local MoveDir = Vector3.zero
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then MoveDir += Camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then MoveDir -= Camera.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then MoveDir -= Camera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then MoveDir += Camera.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then MoveDir += Vector3.new(0, 1, 0) end
-            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then MoveDir -= Vector3.new(0, 1, 0) end
-
-            if MoveDir.Magnitude > 0 then MoveDir = MoveDir.Unit end
-
-            FlyBodyVelocity.Velocity = MoveDir * SPEED
-            FlyBodyGyro.CFrame = Camera.CFrame
+        FlyConn = RunService.RenderStepped:Connect(function()
+            if not HRP or not HRP.Parent then Movement:StopFly(); return end
+            local Cam = workspace.CurrentCamera; if not Cam then return end
+            local Dir = Vector3.zero
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then Dir += Cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then Dir -= Cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then Dir -= Cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then Dir += Cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Dir += Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Dir -= Vector3.new(0, 1, 0) end
+            if Dir.Magnitude > 0 then Dir = Dir.Unit end
+            FlyBV.Velocity = Dir * SPEED
+            FlyBG.CFrame = Cam.CFrame
         end)
     end
 
     function Movement:StopFly()
-        if FlyConnection then
-            FlyConnection:Disconnect()
-            FlyConnection = nil
-        end
-        if FlyBodyVelocity then FlyBodyVelocity:Destroy(); FlyBodyVelocity = nil end
-        if FlyBodyGyro then FlyBodyGyro:Destroy(); FlyBodyGyro = nil end
-
-        local Character = LocalPlayer.Character
-        if Character then
-            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-            if Humanoid then Humanoid.PlatformStand = false end
+        if FlyConn then FlyConn:Disconnect(); FlyConn = nil end
+        if FlyBV then FlyBV:Destroy(); FlyBV = nil end
+        if FlyBG then FlyBG:Destroy(); FlyBG = nil end
+        local Char = LocalPlayer.Character
+        if Char then
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            if Hum then Hum.PlatformStand = false end
         end
     end
 
-    function Movement:SetFlySpeed(Speed) SPEED = Speed end
+    function Movement:SetFlySpeed(S) SPEED = S end
 
     function Movement:StartInfiniteJump()
-        if IJumpConnection then return end
-        IJumpConnection = UserInputService.JumpRequest:Connect(function()
-            local Character = LocalPlayer.Character
-            if not Character then return end
-            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-            if Humanoid then Humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end
+        if IJumpConn then return end
+        IJumpConn = UserInputService.JumpRequest:Connect(function()
+            local Char = LocalPlayer.Character; if not Char then return end
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            if Hum then Hum:ChangeState(Enum.HumanoidStateType.Jumping) end
         end)
     end
 
     function Movement:StopInfiniteJump()
-        if IJumpConnection then
-            IJumpConnection:Disconnect()
-            IJumpConnection = nil
-        end
+        if IJumpConn then IJumpConn:Disconnect(); IJumpConn = nil end
+    end
+
+    --=============== SPIN BOT ===============
+    function Movement:StartSpinBot()
+        if SpinConn then return end
+        SpinConn = RunService.Heartbeat:Connect(function()
+            local Char = LocalPlayer.Character; if not Char then return end
+            local HRP = Char:FindFirstChild("HumanoidRootPart"); if not HRP then return end
+            HRP.CFrame = HRP.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+        end)
+    end
+
+    function Movement:StopSpinBot()
+        if SpinConn then SpinConn:Disconnect(); SpinConn = nil end
+    end
+
+    function Movement:SetSpinSpeed(S) SpinSpeed = S end
+
+    --=============== THIRD PERSON ===============
+    function Movement:StartThirdPerson()
+        if TPS then return end
+        TPS = {
+            Mode = LocalPlayer.CameraMode,
+            Min = LocalPlayer.CameraMinZoomDistance,
+            Max = LocalPlayer.CameraMaxZoomDistance,
+        }
+        LocalPlayer.CameraMode = Enum.CameraMode.Classic
+        LocalPlayer.CameraMinZoomDistance = 8
+        LocalPlayer.CameraMaxZoomDistance = 20
+    end
+
+    function Movement:StopThirdPerson()
+        if not TPS then return end
+        LocalPlayer.CameraMode = TPS.Mode
+        LocalPlayer.CameraMinZoomDistance = TPS.Min
+        LocalPlayer.CameraMaxZoomDistance = TPS.Max
+        TPS = nil
     end
 
     return Movement
 end)
 
 --==========================================================
---          MODULE REFERENCES
+--          MODULE REFS
 --==========================================================
 local Aimbot = Module.Aimbot
 local ESP = Module.ESP
 local Movement = Module.Movement
 
-Connections.Connect(RunService.RenderStepped, function()
-    ESP:Update()
-end)
-
+Connections.Connect(RunService.RenderStepped, function() ESP:Update() end)
 Connections.Connect(Players.PlayerRemoving, ESP.RemovePlayer)
 
 --==========================================================
@@ -775,7 +630,7 @@ Connections.Connect(Players.PlayerRemoving, ESP.RemovePlayer)
 --==========================================================
 Plugins:Window(Queue, {
     "@kotyk_prostoy | Aimbot + ESP",
-    "by @kotyk_prostoy"
+    "by @kotyk_prostoy  |  " .. TG_LINK
 })
 
 Plugins:Community()
@@ -794,40 +649,16 @@ local AimbotTab = Plugins:CreateTab({ "Aimbot", "Automatic aiming" }) do
         Plugins:SetDefault("CheckTeam", false)
         Plugins:SetDefault("TargetBots", true)
 
-        Plugins:Toggle(Section, {
-            "Silent Aim",
-            "Redirect bullets to the nearest target"
-        }, "SilentAim", function(Value)
-            if Value then Aimbot:Enable() else Aimbot:Disable() end
+        Plugins:Toggle(Section, { "Silent Aim", "Redirect bullets to the nearest target" }, "SilentAim", function(v)
+            if v then Aimbot:Enable() else Aimbot:Disable() end
         end)
-
-        Plugins:Dropdown(Section, "Target Mode", {
-            "Nearest", "FOV"
-        }, "TargetMode", function(Value) end)
-
-        Plugins:Dropdown(Section, "Target Part", {
-            "Head", "HumanoidRootPart"
-        }, "TargetPart", function(Value) end)
-
-        Plugins:Slider(Section, {
-            "Distance", "Maximum distance to acquire the target"
-        }, { 50, 400, 10 }, "Distance", function(Value) end)
-
-        Plugins:Slider(Section, {
-            "FOV", "Maximum distance from the crosshair"
-        }, { 10, 300, 5 }, "FOV", function(Value) end)
-
-        Plugins:Toggle(Section, {
-            "Check Wall", "Ignore targets behind walls"
-        }, "CheckWall", function(Value) end)
-
-        Plugins:Toggle(Section, {
-            "Check Team", "Ignore same team players"
-        }, "CheckTeam", function(Value) end)
-
-        Plugins:Toggle(Section, {
-            "Target Bots", "Aim at bots with the IsBot attribute"
-        }, "TargetBots", function(Value) end)
+        Plugins:Dropdown(Section, "Target Mode", { "Nearest", "FOV" }, "TargetMode", function(v) end)
+        Plugins:Dropdown(Section, "Target Part", { "Head", "HumanoidRootPart" }, "TargetPart", function(v) end)
+        Plugins:Slider(Section, { "Distance", "Maximum distance to acquire the target" }, { 50, 400, 10 }, "Distance", function(v) end)
+        Plugins:Slider(Section, { "FOV", "Maximum distance from the crosshair" }, { 10, 300, 5 }, "FOV", function(v) end)
+        Plugins:Toggle(Section, { "Check Wall", "Ignore targets behind walls" }, "CheckWall", function(v) end)
+        Plugins:Toggle(Section, { "Check Team", "Ignore same team players" }, "CheckTeam", function(v) end)
+        Plugins:Toggle(Section, { "Target Bots", "Aim at bots with the IsBot attribute" }, "TargetBots", function(v) end)
     end)
 end
 
@@ -836,83 +667,76 @@ end
 --==========================================================
 local ESPTab = Plugins:CreateTab({ "ESP", "See enemies" }) do
     ESPTab:Section("ESP", function(Section)
-        Plugins:SetDefault("ESP", false)
-        Plugins:SetDefault("ESPBox", true)
-        Plugins:SetDefault("ESPName", true)
-        Plugins:SetDefault("ESPTracer", true)
-        Plugins:SetDefault("ESPBoxOutline", true)
-        Plugins:SetDefault("ESPShowDistance", true)
-        Plugins:SetDefault("ESPFOVCircle", false)
-        Plugins:SetDefault("ESPCheckTeam", false)
-        Plugins:SetDefault("ESPColor", "Red")
-        Plugins:SetDefault("ESPDistance", 300)
-        Plugins:SetDefault("ESPFOV", 100)
-        Plugins:SetDefault("ESPOpacity", 1)
-        Plugins:SetDefault("ESPNameSize", 13)
-        Plugins:SetDefault("ESPTargetBots", true)
+        Plugins:SetDefault("ESP", false); Plugins:SetDefault("ESPBox", true)
+        Plugins:SetDefault("ESPName", true); Plugins:SetDefault("ESPTracer", true)
+        Plugins:SetDefault("ESPBoxOutline", true); Plugins:SetDefault("ESPShowDistance", true)
+        Plugins:SetDefault("ESPFOVCircle", false); Plugins:SetDefault("ESPCheckTeam", false)
+        Plugins:SetDefault("ESPColor", "Red"); Plugins:SetDefault("ESPDistance", 300)
+        Plugins:SetDefault("ESPFOV", 100); Plugins:SetDefault("ESPOpacity", 1)
+        Plugins:SetDefault("ESPNameSize", 13); Plugins:SetDefault("ESPTargetBots", true)
 
-        Plugins:Toggle(Section, { "ESP", "Enable player esp" }, "ESP")
-        Plugins:Toggle(Section, { "Box", "Draw a box around the player" }, "ESPBox")
-        Plugins:Toggle(Section, { "Name", "Show the player name" }, "ESPName")
-        Plugins:Toggle(Section, { "Tracer", "Draw a line from the bottom to the player" }, "ESPTracer")
-        Plugins:Toggle(Section, { "Box Outline", "Draw an outline around the box" }, "ESPBoxOutline")
-        Plugins:Toggle(Section, { "Show Distance", "Show the distance on the name" }, "ESPShowDistance")
-        Plugins:Toggle(Section, { "FOV Circle", "Draw a circle around the crosshair" }, "ESPFOVCircle")
-        Plugins:Toggle(Section, { "Check Team", "Only show enemy team players" }, "ESPCheckTeam")
-        Plugins:Toggle(Section, { "Target Bots", "Show bots with the IsBot attribute" }, "ESPTargetBots")
-
+        Plugins:Toggle(Section, { "ESP", "Enable player esp" }, "ESP", function(v) end)
+        Plugins:Toggle(Section, { "Box", "Draw a box around the player" }, "ESPBox", function(v) end)
+        Plugins:Toggle(Section, { "Name", "Show the player name" }, "ESPName", function(v) end)
+        Plugins:Toggle(Section, { "Tracer", "Draw a line from the bottom to the player" }, "ESPTracer", function(v) end)
+        Plugins:Toggle(Section, { "Box Outline", "Draw an outline around the box" }, "ESPBoxOutline", function(v) end)
+        Plugins:Toggle(Section, { "Show Distance", "Show the distance on the name" }, "ESPShowDistance", function(v) end)
+        Plugins:Toggle(Section, { "FOV Circle", "Draw a circle around the crosshair" }, "ESPFOVCircle", function(v) end)
+        Plugins:Toggle(Section, { "Check Team", "Only show enemy team players" }, "ESPCheckTeam", function(v) end)
+        Plugins:Toggle(Section, { "Target Bots", "Show bots with the IsBot attribute" }, "ESPTargetBots", function(v) end)
         Plugins:Dropdown(Section, "Color", {
-            "Red", "Orange", "Yellow", "Green",
-            "Cyan", "Blue", "Purple", "Pink"
-        }, "ESPColor", function(Value) end)
-
-        Plugins:Slider(Section, { "Distance", "Maximum distance to show the player" }, { 50, 400, 10 }, "ESPDistance")
-        Plugins:Slider(Section, { "FOV", "Radius of the fov circle" }, { 10, 300, 5 }, "ESPFOV")
-        Plugins:Slider(Section, { "Opacity", "Visibility of the drawings" }, { 0, 1, 0.05 }, "ESPOpacity")
-        Plugins:Slider(Section, { "Name Size", "Font size of the name" }, { 8, 30, 1 }, "ESPNameSize")
+            "Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink"
+        }, "ESPColor", function(v) end)
+        Plugins:Slider(Section, { "Distance", "Maximum distance to show the player" }, { 50, 400, 10 }, "ESPDistance", function(v) end)
+        Plugins:Slider(Section, { "FOV", "Radius of the fov circle" }, { 10, 300, 5 }, "ESPFOV", function(v) end)
+        Plugins:Slider(Section, { "Opacity", "Visibility of the drawings" }, { 0, 1, 0.05 }, "ESPOpacity", function(v) end)
+        Plugins:Slider(Section, { "Name Size", "Font size of the name" }, { 8, 30, 1 }, "ESPNameSize", function(v) end)
     end)
 end
 
 --==========================================================
 --          MOVEMENT TAB
 --==========================================================
-local MovementTab = Plugins:CreateTab({ "Movement", "Fly and jump" }) do
+local MovementTab = Plugins:CreateTab({ "Movement", "Fly, jump and spin" }) do
     MovementTab:Section("Fly", function(Section)
         Plugins:SetDefault("Fly", false)
         Plugins:SetDefault("FlySpeed", 60)
 
-        Plugins:Toggle(Section, {
-            "Fly", "WASD move, Space up, LeftCtrl down"
-        }, "Fly", function(Value)
-            if Value then
-                Movement:StartFly()
-            else
-                Movement:StopFly()
-            end
+        Plugins:Toggle(Section, { "Fly", "WASD move, Space up, LeftCtrl down" }, "Fly", function(v)
+            if v then Movement:StartFly() else Movement:StopFly() end
         end)
-
-        Plugins:Slider(Section, {
-            "Fly Speed", "Speed of flight"
-        }, { 20, 300, 5 }, "FlySpeed", function(Value)
-            Movement:SetFlySpeed(Value)
+        Plugins:Slider(Section, { "Fly Speed", "Speed of flight" }, { 20, 300, 5 }, "FlySpeed", function(v)
+            Movement:SetFlySpeed(v)
         end)
     end)
 
     MovementTab:Section("Jump", function(Section)
         Plugins:SetDefault("InfiniteJump", false)
+        Plugins:Toggle(Section, { "Infinite Jump", "Jump as many times as you want" }, "InfiniteJump", function(v)
+            if v then Movement:StartInfiniteJump() else Movement:StopInfiniteJump() end
+        end)
+    end)
 
-        Plugins:Toggle(Section, {
-            "Infinite Jump", "Jump as many times as you want"
-        }, "InfiniteJump", function(Value)
-            if Value then
-                Movement:StartInfiniteJump()
-            else
-                Movement:StopInfiniteJump()
-            end
+    MovementTab:Section("Spin Bot", function(Section)
+        Plugins:SetDefault("SpinBot", false)
+        Plugins:SetDefault("SpinSpeed", 15)
+
+        Plugins:Toggle(Section, { "Spin Bot", "Constantly rotate your character" }, "SpinBot", function(v)
+            if v then Movement:StartSpinBot() else Movement:StopSpinBot() end
+        end)
+        Plugins:Slider(Section, { "Spin Speed", "Degrees per frame" }, { 1, 60, 1 }, "SpinSpeed", function(v)
+            Movement:SetSpinSpeed(v)
+        end)
+    end)
+
+    MovementTab:Section("Camera", function(Section)
+        Plugins:SetDefault("ThirdPerson", false)
+        Plugins:Toggle(Section, { "Third Person View", "Zoom out your camera" }, "ThirdPerson", function(v)
+            if v then Movement:StartThirdPerson() else Movement:StopThirdPerson() end
         end)
     end)
 end
 
 Plugins:Managers()
 
-print("[@kotyk_prostoy] Loaded. Telegram: t.me/kotyk_software")
+print("[@kotyk_prostoy] Loaded. Telegram: " .. TG_LINK)
