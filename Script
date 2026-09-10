@@ -1,6 +1,7 @@
 --[[
-    @kotyk_prostoy | Aimbot + ESP + Movement
-    Key: @kotyk_prostoy | Telegram: t.me/kotyk_software
+    @kotyk_software | Aimbot + ESP + Movement
+    Key: kotyk_w_script | Telegram: t.me/kotyk_software
+    Mobile Fly Support
 ]]
 
 local Players = game:GetService("Players")
@@ -9,7 +10,7 @@ local LP = Players.LocalPlayer
 --==========================================================
 --          KEY SYSTEM (стиль меню)
 --==========================================================
-local VALID_KEY = "@kotyk_prostoy"
+local VALID_KEY = "kotyk_w_script"
 local TG_LINK = "t.me/kotyk_software"
 
 local function keyCheck()
@@ -47,7 +48,7 @@ local function keyCheck()
 
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, -40, 0, 34); title.Position = UDim2.new(0, 20, 0, 16)
-    title.BackgroundTransparency = 1; title.Text = "@kotyk_prostoy"
+    title.BackgroundTransparency = 1; title.Text = "@kotyk_software"
     title.TextColor3 = Color3.fromRGB(255, 255, 255); title.TextSize = 22
     title.Font = Enum.Font.GothamBold; title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = bg
@@ -74,7 +75,7 @@ local function keyCheck()
 
     local box = Instance.new("TextBox")
     box.Size = UDim2.new(1, -24, 1, 0); box.Position = UDim2.new(0, 12, 0, 0)
-    box.BackgroundTransparency = 1; box.PlaceholderText = "Key..." ; box.Text = ""
+    box.BackgroundTransparency = 1; box.PlaceholderText = "Key..."; box.Text = ""
     box.TextColor3 = Color3.fromRGB(230, 230, 235); box.PlaceholderColor3 = Color3.fromRGB(90, 90, 100)
     box.TextSize = 14; box.Font = Enum.Font.GothamMedium
     box.TextXAlignment = Enum.TextXAlignment.Left
@@ -508,7 +509,7 @@ Module:CreateModule("ESP", function(Module)
 end)
 
 --==========================================================
---          MOVEMENT MODULE (Fly + IJ + Spin Bot + Third Person)
+--          MOVEMENT MODULE (Fly + IJ + SpinBot + ThirdPerson + Mobile)
 --==========================================================
 Module:CreateModule("Movement", function(Module)
     local Movement = {}
@@ -517,6 +518,90 @@ Module:CreateModule("Movement", function(Module)
     local SPEED = 60
     local TPS = nil
 
+    -- Мобильные флаги управления
+    local MobileControls = {
+        Forward = false, Back = false, Left = false, Right = false,
+        Up = false, Down = false
+    }
+
+    -- Мобильный GUI управления
+    local MobileGui, MobileButtons = nil, {}
+    local isMobile = UserInputService.TouchEnabled
+
+    local function createMobileControls()
+        if MobileGui then return end
+        local PG = LocalPlayer:WaitForChild("PlayerGui")
+        MobileGui = Instance.new("ScreenGui")
+        MobileGui.Name = "kotyk_mobile_fly"
+        MobileGui.ResetOnSpawn = false
+        MobileGui.Parent = PG
+        MobileGui.DisplayOrder = 500
+
+        -- Вспомогательная функция для кнопки
+        local function mkButton(name, position, label, flag)
+            local btn = Instance.new("TextButton")
+            btn.Name = name
+            btn.Size = UDim2.new(0, 60, 0, 60)
+            btn.Position = position
+            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+            btn.BackgroundTransparency = 0.25
+            btn.Text = label
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btn.TextSize = 18
+            btn.Font = Enum.Font.GothamBold
+            btn.AutoButtonColor = false
+            btn.Parent = MobileGui
+            Instance.new("UICorner", btn).CornerRadius = UDim.new(1, 0)
+            local stroke = Instance.new("UIStroke", btn)
+            stroke.Color = Color3.fromRGB(255, 90, 90)
+            stroke.Thickness = 2
+            stroke.Transparency = 0.3
+
+            -- Pressed/Released
+            btn.MouseButton1Down:Connect(function()
+                MobileControls[flag] = true
+                btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
+                btn.BackgroundTransparency = 0.1
+            end)
+            btn.MouseButton1Up:Connect(function()
+                MobileControls[flag] = false
+                btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+                btn.BackgroundTransparency = 0.25
+            end)
+            btn.MouseLeave:Connect(function()
+                MobileControls[flag] = false
+                btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+                btn.BackgroundTransparency = 0.25
+            end)
+            btn.TouchLongPress:Connect(function() end)
+
+            table.insert(MobileButtons, btn)
+            return btn
+        end
+
+        -- Кнопки слева: W (вверх), A/S/D (движение)
+        mkButton("Forward", UDim2.new(0, 90, 0.5, -130), "▲", "Forward")
+        mkButton("Left",    UDim2.new(0, 20, 0.5, -60),  "◄", "Left")
+        mkButton("Back",    UDim2.new(0, 90, 0.5, -60),  "▼", "Back")
+        mkButton("Right",   UDim2.new(0, 160, 0.5, -60), "►", "Right")
+
+        -- Кнопки справа: Space (вверх), Ctrl (вниз)
+        mkButton("Up",   UDim2.new(1, -90, 0.5, -130), "↑", "Up")
+        mkButton("Down", UDim2.new(1, -90, 0.5, -60),  "↓", "Down")
+    end
+
+    local function destroyMobileControls()
+        if MobileGui then
+            MobileGui:Destroy()
+            MobileGui = nil
+            MobileButtons = {}
+        end
+        for k in pairs(MobileControls) do
+            MobileControls[k] = false
+        end
+    end
+
+    --=============== FLY ===============
     function Movement:StartFly()
         if FlyConn then return end
         local Char = LocalPlayer.Character; if not Char then return end
@@ -533,17 +618,35 @@ Module:CreateModule("Movement", function(Module)
         FlyBG.P = 1000; FlyBG.D = 50
         FlyBG.CFrame = HRP.CFrame; FlyBG.Parent = HRP
 
+        -- Создаём мобильные кнопки если мобилка
+        if isMobile then
+            createMobileControls()
+        end
+
         FlyConn = RunService.RenderStepped:Connect(function()
             if not HRP or not HRP.Parent then Movement:StopFly(); return end
             local Cam = workspace.CurrentCamera; if not Cam then return end
+
             local Dir = Vector3.zero
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then Dir += Cam.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then Dir -= Cam.CFrame.LookVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then Dir -= Cam.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then Dir += Cam.CFrame.RightVector end
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then Dir += Vector3.new(0, 1, 0) end
-            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then Dir -= Vector3.new(0, 1, 0) end
+
+            -- Клавиатура
+            local kbdW = UserInputService:IsKeyDown(Enum.KeyCode.W)
+            local kbdS = UserInputService:IsKeyDown(Enum.KeyCode.S)
+            local kbdA = UserInputService:IsKeyDown(Enum.KeyCode.A)
+            local kbdD = UserInputService:IsKeyDown(Enum.KeyCode.D)
+            local kbdSpace = UserInputService:IsKeyDown(Enum.KeyCode.Space)
+            local kbdCtrl = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+
+            -- Мобильные
+            if kbdW or MobileControls.Forward then Dir += Cam.CFrame.LookVector end
+            if kbdS or MobileControls.Back then Dir -= Cam.CFrame.LookVector end
+            if kbdA or MobileControls.Left then Dir -= Cam.CFrame.RightVector end
+            if kbdD or MobileControls.Right then Dir += Cam.CFrame.RightVector end
+            if kbdSpace or MobileControls.Up then Dir += Vector3.new(0, 1, 0) end
+            if kbdCtrl or MobileControls.Down then Dir -= Vector3.new(0, 1, 0) end
+
             if Dir.Magnitude > 0 then Dir = Dir.Unit end
+
             FlyBV.Velocity = Dir * SPEED
             FlyBG.CFrame = Cam.CFrame
         end)
@@ -558,10 +661,12 @@ Module:CreateModule("Movement", function(Module)
             local Hum = Char:FindFirstChildOfClass("Humanoid")
             if Hum then Hum.PlatformStand = false end
         end
+        destroyMobileControls()
     end
 
     function Movement:SetFlySpeed(S) SPEED = S end
 
+    --=============== INFINITE JUMP ===============
     function Movement:StartInfiniteJump()
         if IJumpConn then return end
         IJumpConn = UserInputService.JumpRequest:Connect(function()
@@ -629,8 +734,8 @@ Connections.Connect(Players.PlayerRemoving, ESP.RemovePlayer)
 --          WINDOW
 --==========================================================
 Plugins:Window(Queue, {
-    "@kotyk_prostoy | Aimbot + ESP",
-    "by @kotyk_prostoy  |  " .. TG_LINK
+    "@kotyk_software | Aimbot + ESP",
+    "by @kotyk_software  |  " .. TG_LINK
 })
 
 Plugins:Community()
@@ -702,7 +807,10 @@ local MovementTab = Plugins:CreateTab({ "Movement", "Fly, jump and spin" }) do
         Plugins:SetDefault("Fly", false)
         Plugins:SetDefault("FlySpeed", 60)
 
-        Plugins:Toggle(Section, { "Fly", "WASD move, Space up, LeftCtrl down" }, "Fly", function(v)
+        Plugins:Toggle(Section, {
+            "Fly",
+            isMobile and "Mobile: on-screen buttons appear" or "WASD move, Space up, Ctrl down"
+        }, "Fly", function(v)
             if v then Movement:StartFly() else Movement:StopFly() end
         end)
         Plugins:Slider(Section, { "Fly Speed", "Speed of flight" }, { 20, 300, 5 }, "FlySpeed", function(v)
@@ -739,4 +847,4 @@ end
 
 Plugins:Managers()
 
-print("[@kotyk_prostoy] Loaded. Telegram: " .. TG_LINK)
+print("[@kotyk_software] Loaded. Telegram: " .. TG_LINK)
