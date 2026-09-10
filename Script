@@ -1,0 +1,711 @@
+--==========================================================
+--  FLICK — All-in-one
+--==========================================================
+local Players    = game:GetService("Players")
+local UIS        = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Lighting   = game:GetService("Lighting")
+local Workspace  = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local camera = Workspace.CurrentCamera
+
+--====================== GUI ======================--
+local gui = Instance.new("ScreenGui")
+gui.Name = "FlickGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 400, 0, 500)
+main.Position = UDim2.new(0.5, -200, 0.5, -250)
+main.BackgroundColor3 = Color3.fromRGB(18,18,22)
+main.BorderSizePixel = 0
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-50,0,45)
+title.Position = UDim2.new(0,15,0,0)
+title.BackgroundTransparency = 1
+title.Text = "FLICK"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextSize = 21
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = main
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0,35,0,35)
+close.Position = UDim2.new(1,-43,0,5)
+close.BackgroundColor3 = Color3.fromRGB(35,35,42)
+close.Text = "×"
+close.TextColor3 = Color3.new(1,1,1)
+close.TextSize = 23
+close.Parent = main
+Instance.new("UICorner", close).CornerRadius = UDim.new(0,7)
+
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(1,-20,1,-55)
+scroll.Position = UDim2.new(0,10,0,50)
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.ScrollBarThickness = 3
+scroll.Parent = main
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0,6)
+layout.Parent = scroll
+
+--====================== STATE ======================--
+local activeConn = {}
+local activeInst = {}
+local activeDraw = {}
+local activeData = {}
+
+local function track(name, ...)
+    for _, v in ipairs({...}) do
+        local t = typeof(v)
+        if t == "RBXScriptConnection" then
+            activeConn[name] = activeConn[name] or {}
+            table.insert(activeConn[name], v)
+        elseif t == "Instance" then
+            activeInst[name] = activeInst[name] or {}
+            table.insert(activeInst[name], v)
+        elseif t == "table" and v.Disconnect then
+            activeInst[name] = activeInst[name] or {}
+            table.insert(activeInst[name], v) -- кастомный объект с Disconnect
+        else
+            activeDraw[name] = activeDraw[name] or {}
+            table.insert(activeDraw[name], v)
+        end
+    end
+end
+
+function clearFeature(name)
+    if activeConn[name] then
+        for _, c in ipairs(activeConn[name]) do pcall(function() c:Disconnect() end) end
+        activeConn[name] = nil
+    end
+    if activeInst[name] then
+        for _, i in ipairs(activeInst[name]) do
+            pcall(function()
+                if i.Disconnect then i:Disconnect() else i:Destroy() end
+            end)
+        end
+        activeInst[name] = nil
+    end
+    if activeDraw[name] then
+        for _, d in ipairs(activeDraw[name]) do pcall(function() d:Remove() end) end
+        activeDraw[name] = nil
+    end
+end
+
+local function hasDrawing() return rawget(_G, "Drawing") ~= nil end
+local function localChar() return player.Character end
+local function localRoot()
+    local c = localChar()
+    return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso"))
+end
+local function localHum()
+    local c = localChar()
+    return c and c:FindFirstChildOfClass("Humanoid")
+end
+local function otherRoot(plr)
+    local c = plr.Character
+    return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso"))
+end
+
+close.MouseButton1Click:Connect(function()
+    for name in pairs(activeConn) do clearFeature(name) end
+    for name in pairs(activeInst) do clearFeature(name) end
+    for name in pairs(activeDraw) do clearFeature(name) end
+    gui:Destroy()
+end)
+
+--====================== FEATURES ======================--
+local Features = {}
+
+-- 1. Model Changer
+Features["Model Changer"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    local function paint()
+        local c = localChar(); if not c then return end
+        for _, p in ipairs(c:GetDescendants()) do
+            if p:IsA("BasePart") and p.Name ~= "HumanoidRootPart" then
+                p.Color = Color3.fromRGB(math.random(50,255), math.random(50,255), math.random(50,255))
+            end
+        end
+    end
+    paint()
+    track(name, player.CharacterAdded:Connect(function() task.wait(1); paint() end))
+end
+
+-- 2. Skinchanger
+Features["Skinchanger"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+end
+
+-- 3. Sticker Changer
+Features["Sticker Changer"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+end
+
+-- 4. Chams / WallHack
+Features["Chams / WallHack"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    local function addHL(char)
+        if not char then return end
+        local hl = Instance.new("Highlight")
+        hl.FillColor = Color3.fromRGB(255,60,60)
+        hl.OutlineColor = Color3.new(1,1,1)
+        hl.FillTransparency = 0.5
+        hl.OutlineTransparency = 0
+        hl.Parent = char
+        track(name, hl)
+    end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player then addHL(plr.Character) end
+    end
+    track(name, Players.PlayerAdded:Connect(function(plr)
+        track(name, plr.CharacterAdded:Connect(function(char)
+            task.wait(0.3); addHL(char)
+        end))
+    end))
+end
+
+-- 5. ESP Lines / Boxes
+Features["ESP Lines / Boxes"] = function(on, name)
+    clearFeature(name)
+    if not on or not hasDrawing() then return end
+    local boxes, lines = {}, {}
+    local function mk(plr)
+        local b = Drawing.new("Square")
+        b.Thickness, b.Color, b.Filled, b.Visible = 1, Color3.fromRGB(255,80,80), false, false
+        track(name, b); boxes[plr] = b
+        local l = Drawing.new("Line")
+        l.Thickness, l.Color, l.Visible = 1, Color3.fromRGB(255,80,80), false
+        track(name, l); lines[plr] = l
+    end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player then mk(plr) end
+    end
+    track(name, RunService.RenderStepped:Connect(function()
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            if not boxes[plr] then mk(plr) end
+            local hrp = otherRoot(plr)
+            if hrp then
+                local pos, onS = camera:WorldToViewportPoint(hrp.Position)
+                if onS then
+                    local head = plr.Character:FindFirstChild("Head")
+                    local hp = head and camera:WorldToViewportPoint(head.Position)
+                    local h = hp and math.abs(hp.Y - pos.Y) * 1.8 or 60
+                    local w = h * 0.5
+                    boxes[plr].Size = Vector2.new(w, h)
+                    boxes[plr].Position = Vector2.new(pos.X - w/2, pos.Y - h/2)
+                    boxes[plr].Visible = true
+                    lines[plr].From = Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y)
+                    lines[plr].To = Vector2.new(pos.X, pos.Y)
+                    lines[plr].Visible = true
+                else
+                    boxes[plr].Visible = false
+                    lines[plr].Visible = false
+                end
+            else
+                if boxes[plr] then boxes[plr].Visible = false end
+                if lines[plr] then lines[plr].Visible = false end
+            end
+        end
+    end))
+end
+
+-- 6. ESP Info
+Features["ESP Info"] = function(on, name)
+    clearFeature(name)
+    if not on or not hasDrawing() then return end
+    local labels = {}
+    local function mkLabel(plr)
+        local t = Drawing.new("Text")
+        t.Size, t.Color, t.Center, t.Outline, t.Visible = 14, Color3.fromRGB(255,255,255), true, true, false
+        track(name, t); labels[plr] = t
+    end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player then mkLabel(plr) end
+    end
+    track(name, RunService.RenderStepped:Connect(function()
+        local myRoot = localRoot()
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            if not labels[plr] then mkLabel(plr) end
+            local hrp = otherRoot(plr)
+            if hrp then
+                local pos, onS = camera:WorldToViewportPoint(hrp.Position)
+                if onS then
+                    local dist = myRoot and (myRoot.Position - hrp.Position).Magnitude or 0
+                    labels[plr].Text = string.format("%s [%d]", plr.Name, math.floor(dist))
+                    labels[plr].Position = Vector2.new(pos.X, pos.Y - 30)
+                    labels[plr].Visible = true
+                else
+                    labels[plr].Visible = false
+                end
+            else
+                labels[plr].Visible = false
+            end
+        end
+    end))
+end
+
+-- 7. Aimbot (СУПЕР-ТОЧНЫЙ через hookmetamethod)
+Features["Aimbot"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+
+    local settings = {
+        targetPart = activeData["aimBone"] or "Head",
+        fov        = 200,
+        wallCheck  = true,
+        teamCheck  = true,
+        prediction = 0.15,
+        useMouse   = true,
+        useRemote  = true,
+        holdKey    = nil, -- напр. Enum.UserInputType.MouseButton2
+    }
+
+    local myMouse = player:GetMouse()
+    local localCharRef = player.Character
+
+    local function getTarget()
+        local closest, bestDist = nil, settings.fov
+        local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            if settings.teamCheck and plr.Team and plr.Team == player.Team then continue end
+            local char = plr.Character; if not char then continue end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum or hum.Health <= 0 then continue end
+            local part = char:FindFirstChild(settings.targetPart)
+            if not part then continue end
+            local sp, onS = camera:WorldToViewportPoint(part.Position)
+            if not onS then continue end
+            if settings.wallCheck then
+                local rp = RaycastParams.new()
+                rp.FilterType = Enum.RaycastFilterType.Exclude
+                rp.FilterDescendantsInstances = {localCharRef}
+                local ray = workspace:Raycast(camera.CFrame.Position,
+                    (part.Position - camera.CFrame.Position).Unit * 1000, rp)
+                if ray and not ray.Instance:IsDescendantOf(char) then continue end
+            end
+            local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
+            if d < bestDist then closest, bestDist = plr, d end
+        end
+        return closest
+    end
+
+    local function getPredicted(target)
+        local char = target and target.Character; if not char then return nil end
+        local part = char:FindFirstChild(settings.targetPart); if not part then return nil end
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum and hum.MoveDirection.Magnitude > 0 then
+            local vel = hum.MoveDirection * hum.WalkSpeed
+            return part.Position + vel * settings.prediction
+        end
+        return part.Position
+    end
+
+    local function isActive()
+        if not settings.holdKey then return true end
+        if typeof(settings.holdKey) == "EnumItem" then
+            if settings.holdKey.EnumType == Enum.UserInputType then
+                return UIS:IsMouseButtonPressed(settings.holdKey)
+            else
+                return UIS:IsKeyDown(settings.holdKey)
+            end
+        end
+        return true
+    end
+
+    -- Хук __namecall
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        if settings.useRemote and isActive() and not checkcaller()
+        and (method == "FireServer" or method == "InvokeServer") then
+            local target = getTarget()
+            if target then
+                local pos = getPredicted(target)
+                if pos then
+                    for i, v in ipairs(args) do
+                        if typeof(v) == "Vector3" then
+                            args[i] = pos
+                        elseif typeof(v) == "CFrame" then
+                            args[i] = CFrame.new(pos)
+                        end
+                    end
+                    return oldNamecall(self, table.unpack(args))
+                end
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+    track(name, { Disconnect = function()
+        if oldNamecall then hookmetamethod(game, "__namecall", oldNamecall) end
+    end })
+
+    -- Хук __index (Mouse.Hit / Mouse.Target)
+    local oldIndex
+    oldIndex = hookmetamethod(game, "__index", function(self, key)
+        if settings.useMouse and isActive() and not checkcaller() then
+            if self == myMouse and (key == "Hit" or key == "Target") then
+                local target = getTarget()
+                if target then
+                    local pos = getPredicted(target)
+                    if pos then
+                        if key == "Hit" then return CFrame.new(pos)
+                        elseif key == "Target" then return target.Character end
+                    end
+                end
+            end
+        end
+        return oldIndex(self, key)
+    end)
+    track(name, { Disconnect = function()
+        if oldIndex then hookmetamethod(game, "__index", oldIndex) end
+    end })
+
+    track(name, player.CharacterAdded:Connect(function(char) localCharRef = char end))
+
+    print("[FLICK] Aimbot: супер-точный режим | target = " .. settings.targetPart)
+end
+
+-- 8. Silent Aim (плейсхолдер)
+Features["Silent Aim"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+end
+
+-- 9. FOV / Smooth
+Features["FOV / Smooth"] = function(on, name)
+    clearFeature(name)
+    if on then
+        activeData[name] = camera.FieldOfView
+        track(name, RunService.RenderStepped:Connect(function() camera.FieldOfView = 100 end))
+    else
+        if activeData[name] then camera.FieldOfView = activeData[name]; activeData[name] = nil end
+    end
+end
+
+-- 10. Aim Bone
+Features["Aim Bone"] = function(on, name)
+    local parts = {"Head", "HumanoidRootPart", "Torso"}
+    local i = table.find(parts, activeData["aimBone"] or "Head") or 1
+    i = i % #parts + 1
+    activeData["aimBone"] = parts[i]
+    print("[FLICK] Aim Bone -> " .. parts[i])
+end
+
+-- 11. No Recoil
+Features["No Recoil"] = function(on, name)
+    clearFeature(name)
+end
+
+-- 12. No Spread
+Features["No Spread"] = function(on, name)
+    clearFeature(name)
+end
+
+-- 13. Third Person View
+Features["Third Person View"] = function(on, name)
+    clearFeature(name)
+    if on then
+        activeData[name] = {mode = player.CameraMode, min = player.CameraMinZoomDistance, max = player.CameraMaxZoomDistance}
+        player.CameraMode = Enum.CameraMode.Classic
+        player.CameraMinZoomDistance = 8
+        player.CameraMaxZoomDistance = 20
+    else
+        local d = activeData[name]
+        if d then
+            player.CameraMode = d.mode
+            player.CameraMinZoomDistance = d.min
+            player.CameraMaxZoomDistance = d.max
+            activeData[name] = nil
+        end
+    end
+end
+
+-- 14. BunnyHop
+Features["BunnyHop (Bhop)"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    track(name, UIS.JumpRequest:Connect(function()
+        local hum = localHum()
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end))
+end
+
+-- 15. Radar Hack
+Features["Radar Hack"] = function(on, name)
+    clearFeature(name)
+    if not on or not hasDrawing() then return end
+    local frame = Drawing.new("Square")
+    frame.Thickness, frame.Color, frame.Filled, frame.Visible = 2, Color3.fromRGB(0,200,255), true, true
+    frame.Size = Vector2.new(160, 160)
+    frame.Position = Vector2.new(20, 200)
+    track(name, frame)
+    local dots = {}
+    track(name, RunService.RenderStepped:Connect(function()
+        local root = localRoot(); if not root then return end
+        local center = Vector2.new(100, 280)
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr == player then continue end
+            if not dots[plr] then
+                local d = Drawing.new("Circle")
+                d.Radius, d.Filled, d.Color, d.Visible = 4, true, Color3.fromRGB(255,80,80), true
+                track(name, d); dots[plr] = d
+            end
+            local hrp = otherRoot(plr)
+            if hrp then
+                local rel = hrp.Position - root.Position
+                dots[plr].Position = Vector2.new(center.X + rel.X * 0.5, center.Y + rel.Z * 0.5)
+                dots[plr].Visible = true
+            else
+                dots[plr].Visible = false
+            end
+        end
+    end))
+end
+
+-- 16. Anti-Flash / Anti-Smoke
+Features["Anti-Flash / Anti-Smoke"] = function(on, name)
+    clearFeature(name)
+    if on then
+        local disabled = {}
+        for _, d in ipairs(Workspace:GetDescendants()) do
+            if d:IsA("Smoke") or d:IsA("Fire") or d:IsA("Sparkles") then
+                disabled[d] = d.Enabled
+                d.Enabled = false
+            end
+        end
+        activeData[name] = disabled
+    else
+        local list = activeData[name]
+        if list then
+            for obj, st in pairs(list) do
+                if obj and obj.Parent then obj.Enabled = st end
+            end
+            activeData[name] = nil
+        end
+    end
+end
+
+-- 17. SpeedHack / Fly
+Features["SpeedHack / Fly"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    local speed = 100
+    track(name, RunService.Heartbeat:Connect(function()
+        local hum = localHum()
+        if hum then hum.WalkSpeed = speed end
+    end))
+    local function setupFly()
+        local root = localRoot(); if not root then return end
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+        bv.Velocity = Vector3.zero
+        bv.Parent = root
+        track(name, bv)
+        track(name, RunService.RenderStepped:Connect(function()
+            local move = Vector3.zero
+            if UIS:IsKeyDown(Enum.KeyCode.W) then move += camera.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.S) then move -= camera.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.A) then move -= camera.CFrame.RightVector end
+            if UIS:IsKeyDown(Enum.KeyCode.D) then move += camera.CFrame.RightVector end
+            if UIS:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.new(0,1,0) end
+            if move.Magnitude > 0 then move = move.Unit * 60 end
+            if root and bv.Parent then bv.Velocity = move end
+        end))
+    end
+    if localRoot() then setupFly() end
+    track(name, player.CharacterAdded:Connect(function() task.wait(0.5); setupFly() end))
+end
+
+-- 18. Inf Ammo / Rapid Fire
+Features["Inf Ammo / Rapid Fire"] = function(on, name)
+    clearFeature(name)
+end
+
+-- 19. Trigger Bot
+Features["Trigger Bot"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    track(name, RunService.RenderStepped:Connect(function()
+        local mp = UIS:GetMouseLocation()
+        local unit = camera:ViewportPointToRay(mp.X, mp.Y)
+        local params = RaycastParams.new()
+        params.FilterType = Enum.RaycastFilterType.Exclude
+        params.FilterDescendantsInstances = {localChar()}
+        local hit = Workspace:Raycast(unit.Origin, unit.Direction * 500, params)
+        if hit and hit.Instance then
+            local model = hit.Instance:FindFirstAncestorOfClass("Model")
+            if model and Players:GetPlayerFromCharacter(model) then
+                local tool = localChar() and localChar():FindFirstChildOfClass("Tool")
+                if tool then pcall(function() tool:Activate() end) end
+            end
+        end
+    end))
+end
+
+-- 20. Knife Bot
+Features["Knife Bot"] = function(on, name)
+    clearFeature(name)
+end
+
+-- 21. Teleport Kill
+Features["Teleport Kill"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    local target = nil
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player and plr.Character then target = plr; break end
+    end
+    local root = localRoot()
+    if target and root then
+        local tr = otherRoot(target)
+        if tr then root.CFrame = tr.CFrame * CFrame.new(0, 0, 2) end
+    end
+end
+
+-- 22. Fake Lag
+Features["Fake Lag"] = function(on, name)
+    clearFeature(name)
+end
+
+-- 23. Crosshair Custom
+Features["Crosshair Custom"] = function(on, name)
+    clearFeature(name)
+    if not on or not hasDrawing() then return end
+    local function mk()
+        local d = Drawing.new("Line"); d.Thickness = 2; d.Color = Color3.fromRGB(0,255,0); d.Visible = true
+        track(name, d); return d
+    end
+    local up, dn, lf, rt = mk(), mk(), mk(), mk()
+    track(name, RunService.RenderStepped:Connect(function()
+        local cx, cy = camera.ViewportSize.X/2, camera.ViewportSize.Y/2
+        local gap, len = 5, 12
+        up.From = Vector2.new(cx, cy - gap);     up.To = Vector2.new(cx, cy - gap - len)
+        dn.From = Vector2.new(cx, cy + gap);     dn.To = Vector2.new(cx, cy + gap + len)
+        lf.From = Vector2.new(cx - gap, cy);     lf.To = Vector2.new(cx - gap - len, cy)
+        rt.From = Vector2.new(cx + gap, cy);     rt.To = Vector2.new(cx + gap + len, cy)
+    end))
+end
+
+-- 24. Night Mode
+Features["Night Mode"] = function(on, name)
+    clearFeature(name)
+    if on then
+        activeData[name] = {
+            Ambient = Lighting.Ambient,
+            Outdoor = Lighting.OutdoorAmbient,
+            Brightness = Lighting.Brightness,
+            ClockTime = Lighting.ClockTime,
+            FogEnd = Lighting.FogEnd,
+        }
+        Lighting.Ambient = Color3.fromRGB(0,0,0)
+        Lighting.OutdoorAmbient = Color3.fromRGB(15,15,25)
+        Lighting.Brightness = 0.2
+        Lighting.ClockTime = 0
+        Lighting.FogEnd = 300
+    else
+        local d = activeData[name]
+        if d then
+            Lighting.Ambient = d.Ambient
+            Lighting.OutdoorAmbient = d.Outdoor
+            Lighting.Brightness = d.Brightness
+            Lighting.ClockTime = d.ClockTime
+            Lighting.FogEnd = d.FogEnd
+            activeData[name] = nil
+        end
+    end
+end
+
+-- 25. Anti-Aim
+Features["Anti-Aim"] = function(on, name)
+    clearFeature(name)
+    if not on then return end
+    track(name, RunService.RenderStepped:Connect(function()
+        local c = localChar(); if not c then return end
+        local hrp = c:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+        hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(math.random(-180,180)), 0)
+    end))
+end
+
+--====================== BUILD BUTTONS ======================--
+local list = {
+"Model Changer","Skinchanger","Sticker Changer","Chams / WallHack",
+"ESP Lines / Boxes","ESP Info","Aimbot","Silent Aim","FOV / Smooth",
+"Aim Bone","No Recoil","No Spread","Third Person View","BunnyHop (Bhop)",
+"Radar Hack","Anti-Flash / Anti-Smoke","SpeedHack / Fly","Inf Ammo / Rapid Fire",
+"Trigger Bot","Knife Bot","Teleport Kill","Fake Lag","Crosshair Custom",
+"Night Mode","Anti-Aim"
+}
+
+for _, name in ipairs(list) do
+    local state = false
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1,-5,0,38)
+    button.BackgroundColor3 = Color3.fromRGB(28,28,34)
+    button.BorderSizePixel = 0
+    button.Text = name.."  [ OFF ]"
+    button.TextColor3 = Color3.fromRGB(230,230,235)
+    button.TextSize = 14
+    button.Font = Enum.Font.GothamMedium
+    button.Parent = scroll
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0,7)
+
+    button.MouseButton1Click:Connect(function()
+        state = not state
+        button.Text = name.."  [ "..(state and "ON" or "OFF").." ]"
+        button.BackgroundColor3 = state and Color3.fromRGB(40,75,52) or Color3.fromRGB(28,28,34)
+        local fn = Features[name]
+        if fn then
+            local ok, err = pcall(fn, state, name)
+            if not ok then warn("[FLICK] "..name..": "..tostring(err)) end
+        end
+    end)
+end
+
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scroll.CanvasSize = UDim2.new(0,0,0,layout.AbsoluteContentSize.Y + 10)
+end)
+
+--====================== DRAGGING ======================--
+local dragging, dragStart, startPos = false, nil, nil
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+    or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+print("[FLICK] Loaded. GUI ready.")
