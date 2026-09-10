@@ -1,86 +1,120 @@
 --[[
     @kotyk_software HUB
-    Silent Aim Edition | Fixed + Demo
+    Rayfield UI + Universal Silent Aim + Key System with DEMO
     Author: @kotyk_software
-    Ключ: @kotyk_software
+    Key: @kotyk_software
+    Ключ купить у: @kotyk_prostoy
 ]]
 
-local Players     = game:GetService("Players")
-local UIS         = game:GetService("UserInputService")
-local RunService  = game:GetService("RunService")
-local Workspace   = game:GetService("Workspace")
-
-local LP     = Players.LocalPlayer
-local Camera = Workspace.CurrentCamera
-
-local startESP, stopESP, startFOVCircle, stopFOVCircle, startSkeleton, stopSkeleton
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
 
 --==========================================================
---                    KEY SYSTEM + DEMO
+--          KEY SYSTEM + DEMO
 --==========================================================
 local VALID_KEY = "@kotyk_software"
 
 local function keyCheck()
     local PG = LP:WaitForChild("PlayerGui")
     local kgui = Instance.new("ScreenGui")
-    kgui.Name = "kotyk_key"; kgui.ResetOnSpawn = false; kgui.Parent = PG
+    kgui.Name = "kotyk_key"
+    kgui.ResetOnSpawn = false
+    kgui.Parent = PG
+    kgui.DisplayOrder = 999
 
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(0, 340, 0, 230)
-    bg.Position = UDim2.new(0.5, -170, 0.5, -115)
+    bg.Size = UDim2.new(0, 360, 0, 240)
+    bg.Position = UDim2.new(0.5, -180, 0.5, -120)
     bg.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
-    bg.BorderSizePixel = 0; bg.Parent = kgui
-    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 10)
-    local st = Instance.new("UIStroke", bg)
-    st.Color = Color3.fromRGB(255, 90, 90); st.Thickness = 1
+    bg.BorderSizePixel = 0
+    bg.Parent = kgui
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 12)
+    local stroke = Instance.new("UIStroke", bg)
+    stroke.Color = Color3.fromRGB(255, 90, 90)
+    stroke.Thickness = 1.5
 
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 40); title.BackgroundTransparency = 1
-    title.Text = "@kotyk_software"; title.TextColor3 = Color3.fromRGB(255, 90, 90)
-    title.TextSize = 20; title.Font = Enum.Font.GothamBold; title.Parent = bg
+    title.Size = UDim2.new(1, 0, 0, 42)
+    title.BackgroundTransparency = 1
+    title.Text = "@kotyk_software"
+    title.TextColor3 = Color3.fromRGB(255, 90, 90)
+    title.TextSize = 22
+    title.Font = Enum.Font.GothamBold
+    title.Parent = bg
 
     local sub = Instance.new("TextLabel")
-    sub.Size = UDim2.new(1, 0, 0, 16); sub.Position = UDim2.new(0, 0, 0, 38)
-    sub.BackgroundTransparency = 1; sub.Text = "Enter key or try DEMO"
+    sub.Size = UDim2.new(1, 0, 0, 16)
+    sub.Position = UDim2.new(0, 0, 0, 40)
+    sub.BackgroundTransparency = 1
+    sub.Text = "Введите ключ или попробуйте DEMO"
     sub.TextColor3 = Color3.fromRGB(150, 150, 160)
-    sub.TextSize = 11; sub.Font = Enum.Font.Gotham; sub.Parent = bg
+    sub.TextSize = 11
+    sub.Font = Enum.Font.Gotham
+    sub.Parent = bg
 
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(1, -40, 0, 36); box.Position = UDim2.new(0, 20, 0, 62)
-    box.BackgroundColor3 = Color3.fromRGB(28, 28, 34); box.BorderSizePixel = 0
-    box.PlaceholderText = "Key..."; box.Text = ""
+    box.Size = UDim2.new(1, -40, 0, 38)
+    box.Position = UDim2.new(0, 20, 0, 66)
+    box.BackgroundColor3 = Color3.fromRGB(28, 28, 34)
+    box.BorderSizePixel = 0
+    box.PlaceholderText = "Key..."
+    box.Text = ""
     box.TextColor3 = Color3.fromRGB(230, 230, 235)
     box.PlaceholderColor3 = Color3.fromRGB(120, 120, 130)
-    box.TextSize = 14; box.Font = Enum.Font.GothamMedium
-    box.ClearTextOnFocus = false; box.Parent = bg
+    box.TextSize = 14
+    box.Font = Enum.Font.GothamMedium
+    box.ClearTextOnFocus = false
+    box.Parent = bg
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 6)
 
-    -- Кнопка Submit
+    -- Submit
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.5, -25, 0, 34); btn.Position = UDim2.new(0, 20, 0, 106)
+    btn.Size = UDim2.new(0.5, -25, 0, 38)
+    btn.Position = UDim2.new(0, 20, 0, 112)
     btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
-    btn.Text = "Submit"; btn.TextColor3 = Color3.new(1,1,1)
-    btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Parent = bg
+    btn.Text = "Submit"
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = bg
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-    -- Кнопка DEMO
+    -- DEMO
     local demoBtn = Instance.new("TextButton")
-    demoBtn.Size = UDim2.new(0.5, -25, 0, 34); demoBtn.Position = UDim2.new(0.5, 5, 0, 106)
+    demoBtn.Size = UDim2.new(0.5, -25, 0, 38)
+    demoBtn.Position = UDim2.new(0.5, 5, 0, 112)
     demoBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-    demoBtn.Text = "DEMO"; demoBtn.TextColor3 = Color3.fromRGB(230, 230, 235)
-    demoBtn.TextSize = 14; demoBtn.Font = Enum.Font.GothamBold; demoBtn.Parent = bg
+    demoBtn.Text = "DEMO"
+    demoBtn.TextColor3 = Color3.fromRGB(230, 230, 235)
+    demoBtn.TextSize = 14
+    demoBtn.Font = Enum.Font.GothamBold
+    demoBtn.Parent = bg
     Instance.new("UICorner", demoBtn).CornerRadius = UDim.new(0, 6)
 
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -20, 0, 30); status.Position = UDim2.new(0, 10, 0, 150)
-    status.BackgroundTransparency = 1; status.Text = ""
+    status.Size = UDim2.new(1, -20, 0, 40)
+    status.Position = UDim2.new(0, 10, 0, 158)
+    status.BackgroundTransparency = 1
+    status.Text = ""
     status.TextColor3 = Color3.fromRGB(255, 90, 90)
-    status.TextSize = 12; status.Font = Enum.Font.Gotham
-    status.TextWrapped = true; status.Parent = bg
+    status.TextSize = 12
+    status.Font = Enum.Font.GothamMedium
+    status.TextWrapped = true
+    status.Parent = bg
+
+    local footer = Instance.new("TextLabel")
+    footer.Size = UDim2.new(1, 0, 0, 16)
+    footer.Position = UDim2.new(0, 0, 1, -20)
+    footer.BackgroundTransparency = 1
+    footer.Text = "Купить ключ у @kotyk_prostoy"
+    footer.TextColor3 = Color3.fromRGB(120, 120, 130)
+    footer.TextSize = 11
+    footer.Font = Enum.Font.Gotham
+    footer.Parent = bg
 
     local done = false
 
-    -- === ДЕМО-РЕЖИМ ===
+    -- === DEMO (3 секунды, ничего не работает) ===
     demoBtn.MouseButton1Click:Connect(function()
         box.Text = ""
         status.TextColor3 = Color3.fromRGB(255, 200, 80)
@@ -89,727 +123,504 @@ local function keyCheck()
         task.wait(1); if demoBtn.Parent then demoBtn.Text = "2..." end
         task.wait(1); if demoBtn.Parent then demoBtn.Text = "1..." end
         task.wait(1)
-        -- закрываем всё, ничего не работает
         if kgui and kgui.Parent then kgui:Destroy() end
         warn("[@kotyk_software] DEMO MODE — купите ключ у @kotyk_prostoy")
     end)
 
-    -- === SUBMIT ===
+    -- === Submit ===
     local function try()
         if box.Text == VALID_KEY then
-            done = true; status.Text = "Access granted!"
+            done = true
+            status.Text = "Access granted!"
             status.TextColor3 = Color3.fromRGB(80, 200, 120)
-            task.wait(0.4); kgui:Destroy()
+            task.wait(0.4)
+            if kgui and kgui.Parent then kgui:Destroy() end
         else
-            status.Text = "Wrong key! Купите у @kotyk_prostoy"
+            status.Text = "Неверный ключ!\nКупите у @kotyk_prostoy"
             status.TextColor3 = Color3.fromRGB(255, 90, 90)
             box.Text = ""
         end
     end
     btn.MouseButton1Click:Connect(try)
-    box.FocusLost:Connect(function(e) if e then try() end end)
+    box.FocusLost:Connect(function(enter) if enter then try() end end)
 
     repeat task.wait(0.1) until done or not kgui.Parent
     return done
 end
 
-if not keyCheck() then return end
+if not keyCheck() then
+    return
+end
 
 --==========================================================
---                    CONFIG
+--          RAYFIELD UI
 --==========================================================
-local Config = {
-    SilentAim = {
-        Enabled     = false, TargetPart = "Head", FOV = 150,
-        MaxDistance = 500, WallCheck = true, TeamCheck = true,
-        Prediction  = 0.15, HoldKey = nil,
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "@kotyk_software | Silent Aim",
+    LoadingTitle = "@kotyk_software",
+    LoadingSubtitle = "by Averiias & kotyk_software",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "kotyk_software",
+        FileName = "SilentAimConfig"
     },
-    Aimbot = {
-        Enabled     = false, TargetPart = "Head", FOV = 150,
-        MaxDistance = 500, Smoothness = 0.25,
-        WallCheck   = true, TeamCheck = true,
+    Discord = {
+        Enabled = false,
+        Invite = "",
+        RememberJoins = true
     },
-    Visuals = {
-        ESP = false, Tracers = false, Names = false,
-        Distance = false, Skeleton = false, FOVCircle = false,
-        ESPColor = Color3.fromRGB(255, 80, 80),
-    },
-    Player = {
-        WalkSpeed = false, SpeedValue = 100,
-        InfiniteJump = false, NoClip = false,
-    }
+    KeySystem = false -- уже проверено выше
+})
+
+--==========================================================
+--          SETTINGS
+--==========================================================
+getgenv().SilentAimSettings = getgenv().SilentAimSettings or {
+    Enabled = false,
+    ToggleKey = "RightAlt",
+    TeamCheck = false,
+    VisibleCheck = false,
+    TargetPart = "HumanoidRootPart",
+    SilentAimMethod = "Raycast",
+    FOVRadius = 130,
+    FOVVisible = false,
+    ShowSilentAimTarget = false,
+    MouseHitPrediction = false,
+    MouseHitPredictionAmount = 0.165,
+    HitChance = 100
 }
 
+local Settings = getgenv().SilentAimSettings
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Mouse = LP:GetMouse()
+
+local mouse_box = Drawing.new("Square")
+mouse_box.Visible = false
+mouse_box.ZIndex = 999
+mouse_box.Color = Color3.fromRGB(54, 57, 241)
+mouse_box.Thickness = 2
+mouse_box.Size = Vector2.new(10, 10)
+mouse_box.Filled = true
+
+local fov_circle = Drawing.new("Circle")
+fov_circle.Thickness = 1
+fov_circle.NumSides = 100
+fov_circle.Radius = Settings.FOVRadius
+fov_circle.Filled = false
+fov_circle.Visible = false
+fov_circle.ZIndex = 999
+fov_circle.Transparency = 1
+fov_circle.Color = Color3.fromRGB(54, 57, 241)
+
 --==========================================================
---                    UTILS
+--          UTILS
 --==========================================================
-local function getChar() return LP.Character end
-local function getRoot()
-    local c = getChar()
-    return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso"))
-end
-local function getHum()
-    local c = getChar()
-    return c and c:FindFirstChildOfClass("Humanoid")
-end
-local function otherRoot(plr)
-    local c = plr.Character
-    return c and (c:FindFirstChild("HumanoidRootPart") or c:FindFirstChild("Torso"))
-end
-local function hasDrawing() return rawget(_G, "Drawing") ~= nil end
-
-local function new(class, props, parent)
-    local o = Instance.new(class)
-    for k, v in pairs(props or {}) do o[k] = v end
-    o.Parent = parent
-    return o
+local function getPositionOnScreen(Vector)
+    local Vec3, OnScreen = Camera:WorldToScreenPoint(Vector)
+    return Vector2.new(Vec3.X, Vec3.Y), OnScreen
 end
 
---==========================================================
---                    UI
---==========================================================
-local ScreenGui = new("ScreenGui", {
-    Name = "kotyk_software_Hub", ResetOnSpawn = false,
-    ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-}, LP:WaitForChild("PlayerGui"))
+local function getDirection(Origin, Position)
+    return (Position - Origin).Unit * 1000
+end
 
-local Window = new("Frame", {
-    Size = UDim2.new(0, 520, 0, 400),
-    Position = UDim2.new(0.5, -260, 0.5, -200),
-    BackgroundColor3 = Color3.fromRGB(18, 18, 22),
-    BorderSizePixel = 0, Active = true,
-}, ScreenGui)
-new("UICorner", {CornerRadius = UDim.new(0, 10)}, Window)
-new("UIStroke", {Color = Color3.fromRGB(45, 45, 55), Thickness = 1}, Window)
+local function getMousePosition()
+    return UserInputService:GetMouseLocation()
+end
 
-local TitleBar = new("Frame", {
-    Size = UDim2.new(1, 0, 0, 40),
-    BackgroundColor3 = Color3.fromRGB(24, 24, 30),
-    BorderSizePixel = 0,
-}, Window)
-new("UICorner", {CornerRadius = UDim.new(0, 10)}, TitleBar)
+local function IsPlayerVisible(Player)
+    local PlayerCharacter = Player.Character
+    local LocalPlayerCharacter = LP.Character
+    if not (PlayerCharacter or LocalPlayerCharacter) then return end
+    local PlayerRoot = PlayerCharacter:FindFirstChild(Settings.TargetPart) or PlayerCharacter:FindFirstChild("HumanoidRootPart")
+    if not PlayerRoot then return end
+    local CastPoints = {PlayerRoot.Position, LocalPlayerCharacter, PlayerCharacter}
+    local IgnoreList = {LocalPlayerCharacter, PlayerCharacter}
+    local ObscuringObjects = #Camera:GetPartsObscuringTarget(CastPoints, IgnoreList)
+    return ObscuringObjects == 0
+end
 
-new("TextLabel", {
-    Size = UDim2.new(1, -130, 1, 0), Position = UDim2.new(0, 15, 0, 0),
-    BackgroundTransparency = 1, Text = "@kotyk_software  |  Silent Aim",
-    TextColor3 = Color3.fromRGB(255, 90, 90),
-    TextSize = 15, Font = Enum.Font.GothamBold,
-    TextXAlignment = Enum.TextXAlignment.Left,
-}, TitleBar)
-
-local MinBtn = new("TextButton", {
-    Size = UDim2.new(0, 28, 0, 28), Position = UDim2.new(1, -68, 0, 6),
-    BackgroundColor3 = Color3.fromRGB(40, 40, 48),
-    Text = "—", TextColor3 = Color3.new(1,1,1),
-    TextSize = 18, Font = Enum.Font.GothamBold,
-}, TitleBar)
-new("UICorner", {CornerRadius = UDim.new(0, 6)}, MinBtn)
-
-local CloseBtn = new("TextButton", {
-    Size = UDim2.new(0, 28, 0, 28), Position = UDim2.new(1, -34, 0, 6),
-    BackgroundColor3 = Color3.fromRGB(50, 30, 30),
-    Text = "×", TextColor3 = Color3.new(1,1,1),
-    TextSize = 20, Font = Enum.Font.GothamBold,
-}, TitleBar)
-new("UICorner", {CornerRadius = UDim.new(0, 6)}, CloseBtn)
-CloseBtn.MouseButton1Click:Connect(function()
-    pcall(stopESP); pcall(stopFOVCircle); pcall(stopSkeleton)
-    ScreenGui:Destroy()
-end)
-
-local TabBar = new("Frame", {
-    Size = UDim2.new(1, -20, 0, 34), Position = UDim2.new(0, 10, 0, 46),
-    BackgroundTransparency = 1,
-}, Window)
-new("UIListLayout", {FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 6)}, TabBar)
-
-local Content = new("Frame", {
-    Size = UDim2.new(1, -20, 1, -95), Position = UDim2.new(0, 10, 0, 86),
-    BackgroundTransparency = 1,
-}, Window)
-
-local minimized = false
-local originalSize = Window.Size
-MinBtn.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    if minimized then
-        Window.Size = UDim2.new(0, 220, 0, 40); MinBtn.Text = "+"
-    else
-        Window.Size = originalSize; MinBtn.Text = "—"
+local function getClosestPlayer()
+    local Closest, DistanceToMouse
+    for _, Player in ipairs(Players:GetPlayers()) do
+        if Player == LP then continue end
+        if Settings.TeamCheck and Player.Team == LP.Team then continue end
+        local Character = Player.Character
+        if not Character then continue end
+        if Settings.VisibleCheck and not IsPlayerVisible(Player) then continue end
+        local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+        local Humanoid = Character:FindFirstChild("Humanoid")
+        if not HumanoidRootPart or not Humanoid or Humanoid.Health <= 0 then continue end
+        local ScreenPosition, OnScreen = getPositionOnScreen(HumanoidRootPart.Position)
+        if not OnScreen then continue end
+        local Distance = (getMousePosition() - ScreenPosition).Magnitude
+        if Distance <= (DistanceToMouse or Settings.FOVRadius) then
+            Closest = HumanoidRootPart
+            DistanceToMouse = Distance
+        end
     end
-    TabBar.Visible = not minimized
-    Content.Visible = not minimized
-end)
-
-local pages = {}
-local function selectTab(name)
-    for n, p in pairs(pages) do p.Visible = (n == name) end
+    return Closest
 end
 
-local function makeTab(name)
-    local btn = new("TextButton", {
-        Size = UDim2.new(0, 110, 1, 0),
-        BackgroundColor3 = Color3.fromRGB(28, 28, 34),
-        Text = name, TextColor3 = Color3.fromRGB(220, 220, 230),
-        TextSize = 13, Font = Enum.Font.GothamMedium,
-    }, TabBar)
-    new("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
-
-    local page = new("ScrollingFrame", {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1, BorderSizePixel = 0,
-        ScrollBarThickness = 3, CanvasSize = UDim2.new(0, 0, 0, 0),
-        Visible = false,
-    }, Content)
-    new("UIListLayout", {Padding = UDim.new(0, 6)}, page)
-    pages[name] = page
-    btn.MouseButton1Click:Connect(function() selectTab(name) end)
-    page.ChildAdded:Connect(function()
-        task.defer(function()
-            page.CanvasSize = UDim2.new(0, 0, 0, page.UIListLayout.AbsoluteContentSize.Y + 10)
-        end)
-    end)
-    return page
-end
-
-local function addToggle(page, label, default, callback)
-    local state = default or false
-    local row = new("Frame", {
-        Size = UDim2.new(1, -5, 0, 34),
-        BackgroundColor3 = Color3.fromRGB(26, 26, 32), BorderSizePixel = 0,
-    }, page)
-    new("UICorner", {CornerRadius = UDim.new(0, 6)}, row)
-    new("TextLabel", {
-        Size = UDim2.new(1, -70, 1, 0), Position = UDim2.new(0, 12, 0, 0),
-        BackgroundTransparency = 1, Text = label,
-        TextColor3 = Color3.fromRGB(230, 230, 235),
-        TextSize = 13, Font = Enum.Font.GothamMedium,
-        TextXAlignment = Enum.TextXAlignment.Left,
-    }, row)
-    local btn = new("TextButton", {
-        Size = UDim2.new(0, 50, 0, 22), Position = UDim2.new(1, -60, 0, 6),
-        BackgroundColor3 = state and Color3.fromRGB(60, 140, 80) or Color3.fromRGB(55, 55, 65),
-        Text = state and "ON" or "OFF", TextColor3 = Color3.new(1,1,1),
-        TextSize = 11, Font = Enum.Font.GothamBold,
-    }, row)
-    new("UICorner", {CornerRadius = UDim.new(0, 5)}, btn)
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = state and "ON" or "OFF"
-        btn.BackgroundColor3 = state and Color3.fromRGB(60, 140, 80) or Color3.fromRGB(55, 55, 65)
-        if callback then pcall(callback, state) end
-    end)
-    return row
-end
-
-local function addSlider(page, label, min, max, default, callback)
-    local value = default
-    local row = new("Frame", {
-        Size = UDim2.new(1, -5, 0, 46),
-        BackgroundColor3 = Color3.fromRGB(26, 26, 32), BorderSizePixel = 0,
-    }, page)
-    new("UICorner", {CornerRadius = UDim.new(0, 6)}, row)
-    local lbl = new("TextLabel", {
-        Size = UDim2.new(1, -20, 0, 18), Position = UDim2.new(0, 10, 0, 4),
-        BackgroundTransparency = 1, Text = label .. ": " .. tostring(value),
-        TextColor3 = Color3.fromRGB(230, 230, 235),
-        TextSize = 12, Font = Enum.Font.GothamMedium,
-        TextXAlignment = Enum.TextXAlignment.Left,
-    }, row)
-    local barBg = new("Frame", {
-        Size = UDim2.new(1, -20, 0, 8), Position = UDim2.new(0, 10, 0, 28),
-        BackgroundColor3 = Color3.fromRGB(40, 40, 48), BorderSizePixel = 0,
-    }, row)
-    new("UICorner", {CornerRadius = UDim.new(1, 0)}, barBg)
-    local fill = new("Frame", {
-        Size = UDim2.new((value - min) / (max - min), 0, 1, 0),
-        BackgroundColor3 = Color3.fromRGB(255, 90, 90), BorderSizePixel = 0,
-    }, barBg)
-    new("UICorner", {CornerRadius = UDim.new(1, 0)}, fill)
-    local dragging = false
-    local function update(x)
-        local rel = math.clamp((x - barBg.AbsolutePosition.X) / barBg.AbsoluteSize.X, 0, 1)
-        value = math.floor(min + (max - min) * rel)
-        fill.Size = UDim2.new(rel, 0, 1, 0)
-        lbl.Text = label .. ": " .. tostring(value)
-        if callback then pcall(callback, value) end
-    end
-    barBg.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1
-        or i.UserInputType == Enum.UserInputType.Touch then dragging = true; update(i.Position.X) end
-    end)
-    UIS.InputChanged:Connect(function(i)
-        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement
-        or i.UserInputType == Enum.UserInputType.Touch) then update(i.Position.X) end
-    end)
-    UIS.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1
-        or i.UserInputType == Enum.UserInputType.Touch then dragging = false end
-    end)
-    return row
-end
-
-local function addButton(page, label, callback)
-    local btn = new("TextButton", {
-        Size = UDim2.new(1, -5, 0, 32),
-        BackgroundColor3 = Color3.fromRGB(35, 35, 42),
-        Text = label, TextColor3 = Color3.fromRGB(230, 230, 235),
-        TextSize = 13, Font = Enum.Font.GothamMedium,
-    }, page)
-    new("UICorner", {CornerRadius = UDim.new(0, 6)}, btn)
-    btn.MouseButton1Click:Connect(function() if callback then pcall(callback) end end)
-    return btn
+local function CalculateChance(Percentage)
+    Percentage = math.floor(Percentage)
+    local rng = Random.new()
+    local chance = math.floor(rng:NextNumber(0, 1) * 100) / 100
+    return chance <= Percentage / 100
 end
 
 --==========================================================
---              ESP (Drawing)
+--          TABS
 --==========================================================
-local ESP = { boxes = {}, tracers = {}, names = {}, conn = nil }
+local MainTab    = Window:CreateTab("Main", 4483362458)
+local VisualsTab = Window:CreateTab("Visuals", 4483362458)
+local ConfigTab  = Window:CreateTab("Config", 4483362458)
 
-local function mkESPFor(plr)
-    if not hasDrawing() then return end
-    local box = Drawing.new("Square")
-    box.Thickness = 1; box.Color = Config.Visuals.ESPColor
-    box.Filled = false; box.Visible = false
-    ESP.boxes[plr] = box
+--==========================================================
+--          MAIN TAB
+--==========================================================
+MainTab:CreateSection("Silent Aim")
 
-    local line = Drawing.new("Line")
-    line.Thickness = 1; line.Color = Config.Visuals.ESPColor; line.Visible = false
-    ESP.tracers[plr] = line
+MainTab:CreateToggle({
+    Name = "Enable Silent Aim",
+    CurrentValue = false,
+    Flag = "SilentAimEnabled",
+    Callback = function(Value)
+        Settings.Enabled = Value
+    end
+})
 
-    local txt = Drawing.new("Text")
-    txt.Size = 14; txt.Center = true; txt.Outline = true
-    txt.Color = Color3.new(1,1,1); txt.Visible = false
-    ESP.names[plr] = txt
+MainTab:CreateKeybind({
+    Name = "Toggle Key",
+    CurrentKeybind = "RightAlt",
+    HoldToInteract = false,
+    Flag = "SilentAimKey",
+    Callback = function(Keybind)
+        Settings.ToggleKey = Keybind
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Team Check",
+    CurrentValue = false,
+    Flag = "TeamCheck",
+    Callback = function(Value)
+        Settings.TeamCheck = Value
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Visible Check",
+    CurrentValue = false,
+    Flag = "VisibleCheck",
+    Callback = function(Value)
+        Settings.VisibleCheck = Value
+    end
+})
+
+MainTab:CreateDropdown({
+    Name = "Target Part",
+    Options = {"Head", "HumanoidRootPart", "Random"},
+    CurrentOption = {"HumanoidRootPart"},
+    Flag = "TargetPart",
+    Callback = function(Option)
+        if typeof(Option) == "table" then Option = Option[1] end
+        Settings.TargetPart = Option
+    end
+})
+
+MainTab:CreateDropdown({
+    Name = "Silent Aim Method",
+    Options = {"Raycast", "FindPartOnRay", "FindPartOnRayWithWhitelist", "FindPartOnRayWithIgnoreList", "Mouse.Hit/Target"},
+    CurrentOption = {"Raycast"},
+    Flag = "SilentAimMethod",
+    Callback = function(Option)
+        if typeof(Option) == "table" then Option = Option[1] end
+        Settings.SilentAimMethod = Option
+    end
+})
+
+MainTab:CreateSlider({
+    Name = "Hit Chance",
+    Range = {0, 100},
+    Increment = 1,
+    Suffix = "%",
+    CurrentValue = 100,
+    Flag = "HitChance",
+    Callback = function(Value)
+        Settings.HitChance = Value
+    end
+})
+
+--==========================================================
+--          VISUALS TAB
+--==========================================================
+VisualsTab:CreateSection("Field of View")
+
+VisualsTab:CreateToggle({
+    Name = "Show FOV Circle",
+    CurrentValue = false,
+    Flag = "FOVVisible",
+    Callback = function(Value)
+        Settings.FOVVisible = Value
+        fov_circle.Visible = Value
+    end
+})
+
+VisualsTab:CreateSlider({
+    Name = "FOV Circle Radius",
+    Range = {0, 360},
+    Increment = 1,
+    Suffix = "px",
+    CurrentValue = 130,
+    Flag = "FOVRadius",
+    Callback = function(Value)
+        Settings.FOVRadius = Value
+        fov_circle.Radius = Value
+    end
+})
+
+VisualsTab:CreateColorPicker({
+    Name = "FOV Circle Color",
+    Color = Color3.fromRGB(54, 57, 241),
+    Flag = "FOVColor",
+    Callback = function(Value)
+        fov_circle.Color = Value
+    end
+})
+
+VisualsTab:CreateToggle({
+    Name = "Show Silent Aim Target",
+    CurrentValue = false,
+    Flag = "ShowTarget",
+    Callback = function(Value)
+        Settings.ShowSilentAimTarget = Value
+    end
+})
+
+VisualsTab:CreateColorPicker({
+    Name = "Target Box Color",
+    Color = Color3.fromRGB(54, 57, 241),
+    Flag = "TargetColor",
+    Callback = function(Value)
+        mouse_box.Color = Value
+    end
+})
+
+VisualsTab:CreateSection("Prediction")
+
+VisualsTab:CreateToggle({
+    Name = "Mouse.Hit/Target Prediction",
+    CurrentValue = false,
+    Flag = "Prediction",
+    Callback = function(Value)
+        Settings.MouseHitPrediction = Value
+    end
+})
+
+VisualsTab:CreateSlider({
+    Name = "Prediction Amount",
+    Range = {0.165, 1},
+    Increment = 0.001,
+    Suffix = "s",
+    CurrentValue = 0.165,
+    Flag = "PredictionAmount",
+    Callback = function(Value)
+        Settings.MouseHitPredictionAmount = Value
+    end
+})
+
+--==========================================================
+--          CONFIG TAB
+--==========================================================
+ConfigTab:CreateSection("Configuration")
+
+ConfigTab:CreateButton({
+    Name = "Save Settings",
+    Callback = function()
+        Rayfield:SaveConfiguration()
+        Rayfield:Notify({
+            Title = "@kotyk_software",
+            Content = "Настройки сохранены!",
+            Duration = 3
+        })
+    end
+})
+
+ConfigTab:CreateButton({
+    Name = "Load Settings",
+    Callback = function()
+        Rayfield:LoadConfiguration()
+        local cfg = Rayfield:GetConfiguration()
+        if cfg then
+            Settings.Enabled = cfg.SilentAimEnabled or false
+            Settings.TeamCheck = cfg.TeamCheck or false
+            Settings.VisibleCheck = cfg.VisibleCheck or false
+            Settings.TargetPart = cfg.TargetPart or "HumanoidRootPart"
+            Settings.SilentAimMethod = cfg.SilentAimMethod or "Raycast"
+            Settings.FOVRadius = cfg.FOVRadius or 130
+            Settings.FOVVisible = cfg.FOVVisible or false
+            Settings.ShowSilentAimTarget = cfg.ShowTarget or false
+            Settings.MouseHitPrediction = cfg.Prediction or false
+            Settings.MouseHitPredictionAmount = cfg.PredictionAmount or 0.165
+            Settings.HitChance = cfg.HitChance or 100
+            fov_circle.Radius = Settings.FOVRadius
+            fov_circle.Visible = Settings.FOVVisible
+        end
+        Rayfield:Notify({
+            Title = "@kotyk_software",
+            Content = "Настройки загружены!",
+            Duration = 3
+        })
+    end
+})
+
+ConfigTab:CreateButton({
+    Name = "Reset to Default",
+    Callback = function()
+        Settings.Enabled = false
+        Settings.TeamCheck = false
+        Settings.VisibleCheck = false
+        Settings.TargetPart = "HumanoidRootPart"
+        Settings.SilentAimMethod = "Raycast"
+        Settings.FOVRadius = 130
+        Settings.FOVVisible = false
+        Settings.ShowSilentAimTarget = false
+        Settings.MouseHitPrediction = false
+        Settings.MouseHitPredictionAmount = 0.165
+        Settings.HitChance = 100
+        fov_circle.Radius = 130
+        fov_circle.Visible = false
+        Rayfield:Notify({
+            Title = "@kotyk_software",
+            Content = "Настройки сброшены!",
+            Duration = 3
+        })
+    end
+})
+
+--==========================================================
+--          SILENT AIM HOOKS
+--==========================================================
+local ExpectedArguments = {
+    FindPartOnRayWithIgnoreList = {ArgCountRequired = 3, Args = {"Instance", "Ray", "table", "boolean", "boolean"}},
+    FindPartOnRayWithWhitelist = {ArgCountRequired = 3, Args = {"Instance", "Ray", "table", "boolean"}},
+    FindPartOnRay = {ArgCountRequired = 2, Args = {"Instance", "Ray", "Instance", "boolean", "boolean"}},
+    Raycast = {ArgCountRequired = 3, Args = {"Instance", "Vector3", "Vector3", "RaycastParams"}}
+}
+
+local function ValidateArguments(Args, RayMethod)
+    local Matches = 0
+    if #Args < RayMethod.ArgCountRequired then return false end
+    for Pos, Argument in pairs(Args) do
+        if typeof(Argument) == RayMethod.Args[Pos] then
+            Matches = Matches + 1
+        end
+    end
+    return Matches >= RayMethod.ArgCountRequired
 end
 
-local function destroyESPFor(plr)
-    if ESP.boxes[plr] then ESP.boxes[plr]:Remove(); ESP.boxes[plr] = nil end
-    if ESP.tracers[plr] then ESP.tracers[plr]:Remove(); ESP.tracers[plr] = nil end
-    if ESP.names[plr] then ESP.names[plr]:Remove(); ESP.names[plr] = nil end
-end
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(...)
+    local Method = getnamecallmethod()
+    local Arguments = {...}
+    local self = Arguments[1]
+    local chance = CalculateChance(Settings.HitChance)
 
-startESP = function()
-    if not hasDrawing() then
-        warn("[@kotyk_software] Drawing API недоступен")
-        return
-    end
-    if ESP.conn then return end
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP then mkESPFor(p) end
-    end
-    ESP.conn = RunService.RenderStepped:Connect(function()
-        local myRoot = getRoot()
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p == LP then continue end
-            if not ESP.boxes[p] then mkESPFor(p) end
-            local hrp = otherRoot(p)
-            local box, line, txt = ESP.boxes[p], ESP.tracers[p], ESP.names[p]
-            if hrp and box and line and txt then
-                local pos, onS = Camera:WorldToViewportPoint(hrp.Position)
-                if onS then
-                    local head = p.Character and p.Character:FindFirstChild("Head")
-                    local hp = head and Camera:WorldToViewportPoint(head.Position)
-                    local h = hp and math.abs(hp.Y - pos.Y) * 1.8 or 60
-                    local w = h * 0.5
-
-                    if Config.Visuals.ESP then
-                        box.Size = Vector2.new(w, h)
-                        box.Position = Vector2.new(pos.X - w/2, pos.Y - h/2)
-                        box.Visible = true
-                    else box.Visible = false end
-
-                    if Config.Visuals.Tracers then
-                        line.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
-                        line.To = Vector2.new(pos.X, pos.Y)
-                        line.Visible = true
-                    else line.Visible = false end
-
-                    if Config.Visuals.Names or Config.Visuals.Distance then
-                        local text = ""
-                        if Config.Visuals.Names then text = p.Name end
-                        if Config.Visuals.Distance then
-                            local d = myRoot and math.floor((myRoot.Position - hrp.Position).Magnitude) or 0
-                            text = (text ~= "" and (text .. " | ") or "") .. d .. "m"
-                        end
-                        txt.Text = text
-                        txt.Position = Vector2.new(pos.X, pos.Y - h/2 - 15)
-                        txt.Visible = true
-                    else txt.Visible = false end
-                else
-                    box.Visible = false; line.Visible = false; txt.Visible = false
+    if Settings.Enabled and self == workspace and not checkcaller() and chance then
+        if Method == "FindPartOnRayWithIgnoreList" and Settings.SilentAimMethod == Method then
+            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithIgnoreList) then
+                local A_Ray = Arguments[2]
+                local HitPart = getClosestPlayer()
+                if HitPart then
+                    local Origin = A_Ray.Origin
+                    Arguments[2] = Ray.new(Origin, getDirection(Origin, HitPart.Position))
+                    return oldNamecall(unpack(Arguments))
                 end
-            else
-                if box then box.Visible = false end
-                if line then line.Visible = false end
-                if txt then txt.Visible = false end
             end
-        end
-    end)
-end
-
-stopESP = function()
-    if ESP.conn then ESP.conn:Disconnect(); ESP.conn = nil end
-    for p, _ in pairs(ESP.boxes) do destroyESPFor(p) end
-end
-
---==========================================================
---              FOV Circle
---==========================================================
-local FOVCircle, FOVConn
-startFOVCircle = function()
-    if not hasDrawing() or FOVConn then return end
-    FOVCircle = Drawing.new("Circle")
-    FOVCircle.Thickness = 1
-    FOVCircle.Color = Color3.fromRGB(255, 90, 90)
-    FOVCircle.Filled = false
-    FOVCircle.NumSides = 60
-    FOVCircle.Visible = true
-    FOVConn = RunService.RenderStepped:Connect(function()
-        if not FOVCircle then return end
-        FOVCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-        FOVCircle.Radius = Config.SilentAim.FOV
-    end)
-end
-
-stopFOVCircle = function()
-    if FOVConn then FOVConn:Disconnect(); FOVConn = nil end
-    if FOVCircle then FOVCircle:Remove(); FOVCircle = nil end
-end
-
---==========================================================
---              Skeleton ESP (R6 + R15)
---==========================================================
-local Skeleton = { lines = {}, conn = nil }
-local SKEL_R6 = {
-    {"Head","Torso"}, {"Torso","Left Arm"}, {"Torso","Right Arm"},
-    {"Torso","Left Leg"}, {"Torso","Right Leg"},
-}
-local SKEL_R15 = {
-    {"Head","UpperTorso"}, {"UpperTorso","LowerTorso"},
-    {"UpperTorso","LeftUpperArm"}, {"LeftUpperArm","LeftLowerArm"}, {"LeftLowerArm","LeftHand"},
-    {"UpperTorso","RightUpperArm"}, {"RightUpperArm","RightLowerArm"}, {"RightLowerArm","RightHand"},
-    {"LowerTorso","LeftUpperLeg"}, {"LeftUpperLeg","LeftLowerLeg"}, {"LeftLowerLeg","LeftFoot"},
-    {"LowerTorso","RightUpperLeg"}, {"RightUpperLeg","RightLowerLeg"}, {"RightLowerLeg","RightFoot"},
-}
-
-local function mkSkelLines(plr, count)
-    Skeleton.lines[plr] = Skeleton.lines[plr] or {}
-    for i = 1, count do
-        if not Skeleton.lines[plr][i] then
-            local l = Drawing.new("Line")
-            l.Thickness = 1; l.Color = Color3.fromRGB(255, 255, 255); l.Visible = false
-            Skeleton.lines[plr][i] = l
-        end
-    end
-end
-
-local function destroySkel(plr)
-    if Skeleton.lines[plr] then
-        for _, l in ipairs(Skeleton.lines[plr]) do l:Remove() end
-        Skeleton.lines[plr] = nil
-    end
-end
-
-startSkeleton = function()
-    if not hasDrawing() then return end
-    if Skeleton.conn then return end
-    Skeleton.conn = RunService.RenderStepped:Connect(function()
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p == LP then continue end
-            local char = p.Character
-            if not char then destroySkel(p); continue end
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if not hum then destroySkel(p); continue end
-            local rig = hum.RigType
-            local layout = rig == Enum.HumanoidRigType.R15 and SKEL_R15 or SKEL_R6
-            if not Skeleton.lines[p] then mkSkelLines(p, #layout) end
-            for i, pair in ipairs(layout) do
-                local a = char:FindFirstChild(pair[1])
-                local b = char:FindFirstChild(pair[2])
-                local line = Skeleton.lines[p][i]
-                if a and b and line then
-                    local pa, oa = Camera:WorldToViewportPoint(a.Position)
-                    local pb, ob = Camera:WorldToViewportPoint(b.Position)
-                    if oa and ob then
-                        line.From = Vector2.new(pa.X, pa.Y)
-                        line.To = Vector2.new(pb.X, pb.Y)
-                        line.Visible = true
-                    else line.Visible = false end
-                elseif line then line.Visible = false end
+        elseif Method == "FindPartOnRayWithWhitelist" and Settings.SilentAimMethod == Method then
+            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRayWithWhitelist) then
+                local A_Ray = Arguments[2]
+                local HitPart = getClosestPlayer()
+                if HitPart then
+                    local Origin = A_Ray.Origin
+                    Arguments[2] = Ray.new(Origin, getDirection(Origin, HitPart.Position))
+                    return oldNamecall(unpack(Arguments))
+                end
             end
-        end
-    end)
-end
-
-stopSkeleton = function()
-    if Skeleton.conn then Skeleton.conn:Disconnect(); Skeleton.conn = nil end
-    for p, _ in pairs(Skeleton.lines) do destroySkel(p) end
-end
-
---==========================================================
---                    TABS
---==========================================================
-local CombatTab  = makeTab("Combat")
-local VisualsTab = makeTab("Visuals")
-local PlayerTab  = makeTab("Player")
-selectTab("Combat")
-
-new("TextLabel", {
-    Size = UDim2.new(1, 0, 0, 20), BackgroundTransparency = 1,
-    Text = "SILENT AIM", TextColor3 = Color3.fromRGB(255, 90, 90),
-    TextSize = 12, Font = Enum.Font.GothamBold,
-    TextXAlignment = Enum.TextXAlignment.Left,
-}, CombatTab)
-
-addToggle(CombatTab, "Silent Aim", false, function(on) Config.SilentAim.Enabled = on end)
-addToggle(CombatTab, "Wall Check", true, function(on) Config.SilentAim.WallCheck = on end)
-addToggle(CombatTab, "Team Check", true, function(on) Config.SilentAim.TeamCheck = on end)
-addSlider(CombatTab, "Silent FOV", 10, 500, 150, function(v) Config.SilentAim.FOV = v end)
-addSlider(CombatTab, "Max Distance", 50, 2000, 500, function(v) Config.SilentAim.MaxDistance = v end)
-addSlider(CombatTab, "Prediction x100", 0, 50, 15, function(v) Config.SilentAim.Prediction = v / 100 end)
-
-local TargetBtn = addButton(CombatTab, "Target Part: Head", function()
-    local parts = {"Head", "HumanoidRootPart", "Torso"}
-    local i = table.find(parts, Config.SilentAim.TargetPart) or 1
-    i = i % #parts + 1
-    Config.SilentAim.TargetPart = parts[i]
-    TargetBtn.Text = "Target Part: " .. parts[i]
-end)
-
-new("TextLabel", {
-    Size = UDim2.new(1, 0, 0, 20), BackgroundTransparency = 1,
-    Text = "AIMBOT (camera)", TextColor3 = Color3.fromRGB(255, 90, 90),
-    TextSize = 12, Font = Enum.Font.GothamBold,
-    TextXAlignment = Enum.TextXAlignment.Left,
-}, CombatTab)
-
-addToggle(CombatTab, "Aimbot", false, function(on) Config.Aimbot.Enabled = on end)
-addToggle(CombatTab, "Aimbot Wall Check", true, function(on) Config.Aimbot.WallCheck = on end)
-addToggle(CombatTab, "Aimbot Team Check", true, function(on) Config.Aimbot.TeamCheck = on end)
-addSlider(CombatTab, "Aimbot FOV", 10, 500, 150, function(v) Config.Aimbot.FOV = v end)
-addSlider(CombatTab, "Aimbot Max Distance", 50, 2000, 500, function(v) Config.Aimbot.MaxDistance = v end)
-addSlider(CombatTab, "Smoothness x100", 5, 100, 25, function(v) Config.Aimbot.Smoothness = v / 100 end)
-
-new("TextLabel", {
-    Size = UDim2.new(1, 0, 0, 20), BackgroundTransparency = 1,
-    Text = "ESP", TextColor3 = Color3.fromRGB(255, 90, 90),
-    TextSize = 12, Font = Enum.Font.GothamBold,
-    TextXAlignment = Enum.TextXAlignment.Left,
-}, VisualsTab)
-
-addToggle(VisualsTab, "ESP Boxes", false, function(on)
-    Config.Visuals.ESP = on
-    if on then startESP() elseif not Config.Visuals.Tracers and not Config.Visuals.Names and not Config.Visuals.Distance then stopESP() end
-end)
-addToggle(VisualsTab, "Tracers", false, function(on)
-    Config.Visuals.Tracers = on
-    if on then startESP() elseif not Config.Visuals.ESP and not Config.Visuals.Names and not Config.Visuals.Distance then stopESP() end
-end)
-addToggle(VisualsTab, "Names", false, function(on)
-    Config.Visuals.Names = on
-    if on then startESP() elseif not Config.Visuals.ESP and not Config.Visuals.Tracers and not Config.Visuals.Distance then stopESP() end
-end)
-addToggle(VisualsTab, "Distance", false, function(on)
-    Config.Visuals.Distance = on
-    if on then startESP() elseif not Config.Visuals.ESP and not Config.Visuals.Tracers and not Config.Visuals.Names then stopESP() end
-end)
-addToggle(VisualsTab, "Skeleton ESP", false, function(on)
-    if on then startSkeleton() else stopSkeleton() end
-end)
-addToggle(VisualsTab, "FOV Circle", false, function(on)
-    if on then startFOVCircle() else stopFOVCircle() end
-end)
-
-addToggle(PlayerTab, "WalkSpeed", false, function(on) Config.Player.WalkSpeed = on end)
-addSlider(PlayerTab, "Speed", 16, 500, 100, function(v) Config.Player.SpeedValue = v end)
-addToggle(PlayerTab, "Infinite Jump", false, function(on) Config.Player.InfiniteJump = on end)
-addToggle(PlayerTab, "NoClip", false, function(on) Config.Player.NoClip = on end)
-addButton(PlayerTab, "Teleport to Random Player", function()
-    local list = {}
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and p.Character then table.insert(list, p) end
-    end
-    if #list > 0 then
-        local t = list[math.random(1, #list)]
-        local tr, r = otherRoot(t), getRoot()
-        if tr and r then r.CFrame = tr.CFrame * CFrame.new(0, 0, 3) end
-    end
-end)
-
---==========================================================
---              DRAG WINDOW
---==========================================================
-do
-    local drag, startPos, startMouse
-    TitleBar.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1
-        or i.UserInputType == Enum.UserInputType.Touch then
-            drag = true; startMouse = i.Position; startPos = Window.Position
-        end
-    end)
-    UIS.InputChanged:Connect(function(i)
-        if drag and (i.UserInputType == Enum.UserInputType.MouseMovement
-        or i.UserInputType == Enum.UserInputType.Touch) then
-            local d = i.Position - startMouse
-            Window.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X,
-                                        startPos.Y.Scale, startPos.Y.Offset + d.Y)
-        end
-    end)
-    UIS.InputEnded:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1
-        or i.UserInputType == Enum.UserInputType.Touch then drag = false end
-    end)
-end
-
---==========================================================
---              SILENT AIM (только __index — безопасный)
---==========================================================
-local SilentHooks = {}
-local silentActive = false
-
-local function getSilentTarget()
-    local s = Config.SilentAim
-    local myRoot = getRoot(); if not myRoot then return nil end
-    local closest, best = nil, s.FOV
-    local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr == LP then continue end
-        if s.TeamCheck and plr.Team and plr.Team == LP.Team then continue end
-        local char = plr.Character; if not char then continue end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum or hum.Health <= 0 then continue end
-        local part = char:FindFirstChild(s.TargetPart); if not part then continue end
-        local dist = (part.Position - myRoot.Position).Magnitude
-        if dist > s.MaxDistance then continue end
-        local sp, onS = Camera:WorldToViewportPoint(part.Position)
-        if not onS then continue end
-        if s.WallCheck then
-            local rp = RaycastParams.new()
-            rp.FilterType = Enum.RaycastFilterType.Exclude
-            rp.FilterDescendantsInstances = {LP.Character}
-            local ray = Workspace:Raycast(Camera.CFrame.Position,
-                (part.Position - Camera.CFrame.Position).Unit * 1000, rp)
-            if ray and not ray.Instance:IsDescendantOf(char) then continue end
-        end
-        local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
-        if d < best then closest, best = plr, d end
-    end
-    return closest
-end
-
-local function getSilentPredicted(target)
-    local s = Config.SilentAim
-    local char = target and target.Character; if not char then return nil end
-    local part = char:FindFirstChild(s.TargetPart); if not part then return nil end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum and hum.MoveDirection.Magnitude > 0 then
-        return part.Position + hum.MoveDirection * hum.WalkSpeed * s.Prediction
-    end
-    return part.Position
-end
-
-local function startSilent()
-    if SilentHooks.index then return end
-    local myMouse = LP:GetMouse()
-    local oldIndex
-    oldIndex = hookmetamethod(game, "__index", function(self, key)
-        if Config.SilentAim.Enabled and not checkcaller() then
-            if self == myMouse and (key == "Hit" or key == "Target") then
-                local t = getSilentTarget()
-                if t then
-                    local pos = getSilentPredicted(t)
-                    if pos then
-                        if key == "Hit" then return CFrame.new(pos)
-                        elseif key == "Target" then return t.Character end
-                    end
+        elseif (Method == "FindPartOnRay" or Method == "findPartOnRay") and Settings.SilentAimMethod == Method then
+            if ValidateArguments(Arguments, ExpectedArguments.FindPartOnRay) then
+                local A_Ray = Arguments[2]
+                local HitPart = getClosestPlayer()
+                if HitPart then
+                    local Origin = A_Ray.Origin
+                    Arguments[2] = Ray.new(Origin, getDirection(Origin, HitPart.Position))
+                    return oldNamecall(unpack(Arguments))
+                end
+            end
+        elseif Method == "Raycast" and Settings.SilentAimMethod == Method then
+            if ValidateArguments(Arguments, ExpectedArguments.Raycast) then
+                local A_Origin = Arguments[2]
+                local HitPart = getClosestPlayer()
+                if HitPart then
+                    Arguments[3] = getDirection(A_Origin, HitPart.Position)
+                    return oldNamecall(unpack(Arguments))
                 end
             end
         end
-        return oldIndex(self, key)
-    end)
-    SilentHooks.index = oldIndex
-    print("[@kotyk_software] Silent Aim: ON (__index only)")
-end
-
-local function stopSilent()
-    if SilentHooks.index then
-        hookmetamethod(game, "__index", SilentHooks.index)
-        SilentHooks.index = nil
     end
-    print("[@kotyk_software] Silent Aim: OFF")
-end
+    return oldNamecall(...)
+end))
 
-RunService.Heartbeat:Connect(function()
-    if Config.SilentAim.Enabled and not silentActive then
-        silentActive = true; startSilent()
-    elseif not Config.SilentAim.Enabled and silentActive then
-        silentActive = false; stopSilent()
+local oldIndex
+oldIndex = hookmetamethod(game, "__index", newcclosure(function(self, Index)
+    if self == Mouse and not checkcaller() and Settings.Enabled and Settings.SilentAimMethod == "Mouse.Hit/Target" then
+        local HitPart = getClosestPlayer()
+        if HitPart then
+            if Index == "Target" or Index == "target" then
+                return HitPart
+            elseif Index == "Hit" or Index == "hit" then
+                return (Settings.MouseHitPrediction and (HitPart.CFrame + (HitPart.Velocity * Settings.MouseHitPredictionAmount))) or (not Settings.MouseHitPrediction and HitPart.CFrame)
+            end
+        end
     end
-end)
+    return oldIndex(self, Index)
+end))
 
 --==========================================================
---              AIMBOT (с distance check)
+--          RENDER LOOP
 --==========================================================
 RunService.RenderStepped:Connect(function()
-    if not Config.Aimbot.Enabled then return end
-    local s = Config.Aimbot
-    local myRoot = getRoot(); if not myRoot then return end
-    local closest, best = nil, s.FOV
-    local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr == LP then continue end
-        if s.TeamCheck and plr.Team and plr.Team == LP.Team then continue end
-        local char = plr.Character; if not char then continue end
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if not hum or hum.Health <= 0 then continue end
-        local part = char:FindFirstChild(s.TargetPart); if not part then continue end
-        local dist = (part.Position - myRoot.Position).Magnitude
-        if dist > s.MaxDistance then continue end
-        local sp, onS = Camera:WorldToViewportPoint(part.Position)
-        if not onS then continue end
-        if s.WallCheck then
-            local rp = RaycastParams.new()
-            rp.FilterType = Enum.RaycastFilterType.Exclude
-            rp.FilterDescendantsInstances = {LP.Character}
-            local ray = Workspace:Raycast(Camera.CFrame.Position,
-                (part.Position - Camera.CFrame.Position).Unit * 1000, rp)
-            if ray and not ray.Instance:IsDescendantOf(char) then continue end
+    if Settings.ShowSilentAimTarget and Settings.Enabled then
+        local Target = getClosestPlayer()
+        if Target then
+            local Pos, OnScreen = Camera:WorldToViewportPoint(Target.Position)
+            mouse_box.Visible = OnScreen
+            mouse_box.Position = Vector2.new(Pos.X, Pos.Y)
+        else
+            mouse_box.Visible = false
         end
-        local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
-        if d < best then closest, best = part, d end
+    else
+        mouse_box.Visible = false
     end
-    if closest then
-        local target = CFrame.new(Camera.CFrame.Position, closest.Position)
-        Camera.CFrame = Camera.CFrame:Lerp(target, s.Smoothness)
-    end
-end)
 
---==========================================================
---              PLAYER FEATURES
---==========================================================
-RunService.Heartbeat:Connect(function()
-    local hum = getHum()
-    if hum and Config.Player.WalkSpeed then hum.WalkSpeed = Config.Player.SpeedValue end
-end)
-
-UIS.JumpRequest:Connect(function()
-    if Config.Player.InfiniteJump then
-        local hum = getHum()
-        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-    end
-end)
-
-RunService.Stepped:Connect(function()
-    if Config.Player.NoClip then
-        local c = getChar()
-        if c then
-            for _, p in ipairs(c:GetDescendants()) do
-                if p:IsA("BasePart") and p.CanCollide then p.CanCollide = false end
-            end
-        end
+    if Settings.FOVVisible then
+        fov_circle.Visible = true
+        fov_circle.Position = getMousePosition()
+    else
+        fov_circle.Visible = false
     end
 end)
 
 --==========================================================
-print("[@kotyk_software HUB] Loaded. Silent Aim (safe) + All features ready.")
+Rayfield:Notify({
+    Title = "@kotyk_software",
+    Content = "Silent Aim успешно загружен!",
+    Duration = 5
+})
+
+print("[@kotyk_software] Key accepted. Rayfield UI + Universal Silent Aim loaded.")
