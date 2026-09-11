@@ -1,14 +1,13 @@
 --[[
-    @kotyk_software | Aimbot + ESP + Movement
+    @kotyk_software | Aimbot + ESP + Movement + Weapon
     Key: kotyk_w_script | Telegram: t.me/kotyk_software
-    Mobile Fly Support
 ]]
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 
 --==========================================================
---          KEY SYSTEM (стиль меню)
+--          KEY SYSTEM
 --==========================================================
 local VALID_KEY = "kotyk_w_script"
 local TG_LINK = "t.me/kotyk_software"
@@ -174,7 +173,7 @@ if Folder then
 end
 
 --==========================================================
---          OVERRIDE COMMUNITY (Telegram вместо Discord)
+--          OVERRIDE COMMUNITY (Telegram)
 --==========================================================
 function Plugins:Community()
     local Community = self:CreateTab({
@@ -509,7 +508,7 @@ Module:CreateModule("ESP", function(Module)
 end)
 
 --==========================================================
---          MOVEMENT MODULE (Fly + IJ + SpinBot + ThirdPerson + Mobile)
+--          MOVEMENT MODULE (ФИКС: стик + авто-перезапуск)
 --==========================================================
 Module:CreateModule("Movement", function(Module)
     local Movement = {}
@@ -518,134 +517,74 @@ Module:CreateModule("Movement", function(Module)
     local SPEED = 60
     local TPS = nil
 
-    -- Мобильные флаги управления
-    local MobileControls = {
-        Forward = false, Back = false, Left = false, Right = false,
-        Up = false, Down = false
-    }
-
-    -- Мобильный GUI управления
-    local MobileGui, MobileButtons = nil, {}
-    local isMobile = UserInputService.TouchEnabled
-
-    local function createMobileControls()
-        if MobileGui then return end
-        local PG = LocalPlayer:WaitForChild("PlayerGui")
-        MobileGui = Instance.new("ScreenGui")
-        MobileGui.Name = "kotyk_mobile_fly"
-        MobileGui.ResetOnSpawn = false
-        MobileGui.Parent = PG
-        MobileGui.DisplayOrder = 500
-
-        -- Вспомогательная функция для кнопки
-        local function mkButton(name, position, label, flag)
-            local btn = Instance.new("TextButton")
-            btn.Name = name
-            btn.Size = UDim2.new(0, 60, 0, 60)
-            btn.Position = position
-            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
-            btn.BackgroundTransparency = 0.25
-            btn.Text = label
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            btn.TextSize = 18
-            btn.Font = Enum.Font.GothamBold
-            btn.AutoButtonColor = false
-            btn.Parent = MobileGui
-            Instance.new("UICorner", btn).CornerRadius = UDim.new(1, 0)
-            local stroke = Instance.new("UIStroke", btn)
-            stroke.Color = Color3.fromRGB(255, 90, 90)
-            stroke.Thickness = 2
-            stroke.Transparency = 0.3
-
-            -- Pressed/Released
-            btn.MouseButton1Down:Connect(function()
-                MobileControls[flag] = true
-                btn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
-                btn.BackgroundTransparency = 0.1
-            end)
-            btn.MouseButton1Up:Connect(function()
-                MobileControls[flag] = false
-                btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
-                btn.BackgroundTransparency = 0.25
-            end)
-            btn.MouseLeave:Connect(function()
-                MobileControls[flag] = false
-                btn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
-                btn.BackgroundTransparency = 0.25
-            end)
-            btn.TouchLongPress:Connect(function() end)
-
-            table.insert(MobileButtons, btn)
-            return btn
-        end
-
-        -- Кнопки слева: W (вверх), A/S/D (движение)
-        mkButton("Forward", UDim2.new(0, 90, 0.5, -130), "▲", "Forward")
-        mkButton("Left",    UDim2.new(0, 20, 0.5, -60),  "◄", "Left")
-        mkButton("Back",    UDim2.new(0, 90, 0.5, -60),  "▼", "Back")
-        mkButton("Right",   UDim2.new(0, 160, 0.5, -60), "►", "Right")
-
-        -- Кнопки справа: Space (вверх), Ctrl (вниз)
-        mkButton("Up",   UDim2.new(1, -90, 0.5, -130), "↑", "Up")
-        mkButton("Down", UDim2.new(1, -90, 0.5, -60),  "↓", "Down")
-    end
-
-    local function destroyMobileControls()
-        if MobileGui then
-            MobileGui:Destroy()
-            MobileGui = nil
-            MobileButtons = {}
-        end
-        for k in pairs(MobileControls) do
-            MobileControls[k] = false
-        end
-    end
-
-    --=============== FLY ===============
+    --=============== FLY (мобильный стик) ===============
     function Movement:StartFly()
         if FlyConn then return end
-        local Char = LocalPlayer.Character; if not Char then return end
-        local HRP = Char:FindFirstChild("HumanoidRootPart"); if not HRP then return end
-        local Hum = Char:FindFirstChildOfClass("Humanoid")
-        if Hum then Hum.PlatformStand = true end
 
-        FlyBV = Instance.new("BodyVelocity")
-        FlyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        FlyBV.Velocity = Vector3.zero; FlyBV.Parent = HRP
+        local function setup()
+            local Char = LocalPlayer.Character
+            if not Char then return end
+            local HRP = Char:FindFirstChild("HumanoidRootPart")
+            if not HRP then return end
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            if Hum then Hum.PlatformStand = true end
 
-        FlyBG = Instance.new("BodyGyro")
-        FlyBG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-        FlyBG.P = 1000; FlyBG.D = 50
-        FlyBG.CFrame = HRP.CFrame; FlyBG.Parent = HRP
+            if FlyBV then FlyBV:Destroy() end
+            if FlyBG then FlyBG:Destroy() end
 
-        -- Создаём мобильные кнопки если мобилка
-        if isMobile then
-            createMobileControls()
+            FlyBV = Instance.new("BodyVelocity")
+            FlyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            FlyBV.Velocity = Vector3.zero
+            FlyBV.Parent = HRP
+
+            FlyBG = Instance.new("BodyGyro")
+            FlyBG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+            FlyBG.P = 1000; FlyBG.D = 50
+            FlyBG.CFrame = HRP.CFrame
+            FlyBG.Parent = HRP
         end
 
+        setup()
+
         FlyConn = RunService.RenderStepped:Connect(function()
-            if not HRP or not HRP.Parent then Movement:StopFly(); return end
-            local Cam = workspace.CurrentCamera; if not Cam then return end
+            if not Settings.Fly then return end
+
+            local Char = LocalPlayer.Character
+            if not Char then return end
+            local HRP = Char:FindFirstChild("HumanoidRootPart")
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            if not HRP or not Hum then return end
+
+            -- Если HRP сменился (респавн), пересоздаём
+            if not FlyBV or not FlyBV.Parent then
+                setup()
+                return
+            end
+
+            local Cam = workspace.CurrentCamera
+            if not Cam then return end
 
             local Dir = Vector3.zero
 
-            -- Клавиатура
-            local kbdW = UserInputService:IsKeyDown(Enum.KeyCode.W)
-            local kbdS = UserInputService:IsKeyDown(Enum.KeyCode.S)
-            local kbdA = UserInputService:IsKeyDown(Enum.KeyCode.A)
-            local kbdD = UserInputService:IsKeyDown(Enum.KeyCode.D)
-            local kbdSpace = UserInputService:IsKeyDown(Enum.KeyCode.Space)
-            local kbdCtrl = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+            -- Мобильный стик (MoveDirection) + клавиатура
+            local moveDir = Hum.MoveDirection
+            if moveDir.Magnitude > 0 then
+                local look = Cam.CFrame.LookVector
+                local right = Cam.CFrame.RightVector
+                Dir = (look * (-moveDir.Z) + right * moveDir.X)
+                -- вертикаль от наклона камеры
+                local pitch = look.Y
+                Dir = Dir + Vector3.new(0, pitch * math.abs(moveDir.Z) * 2, 0)
+                if Dir.Magnitude > 0 then Dir = Dir.Unit end
+            end
 
-            -- Мобильные
-            if kbdW or MobileControls.Forward then Dir += Cam.CFrame.LookVector end
-            if kbdS or MobileControls.Back then Dir -= Cam.CFrame.LookVector end
-            if kbdA or MobileControls.Left then Dir -= Cam.CFrame.RightVector end
-            if kbdD or MobileControls.Right then Dir += Cam.CFrame.RightVector end
-            if kbdSpace or MobileControls.Up then Dir += Vector3.new(0, 1, 0) end
-            if kbdCtrl or MobileControls.Down then Dir -= Vector3.new(0, 1, 0) end
-
-            if Dir.Magnitude > 0 then Dir = Dir.Unit end
+            -- ПК: Space вверх, LeftCtrl вниз
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                Dir = Dir + Vector3.new(0, 1, 0)
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                Dir = Dir - Vector3.new(0, 1, 0)
+            end
 
             FlyBV.Velocity = Dir * SPEED
             FlyBG.CFrame = Cam.CFrame
@@ -661,7 +600,6 @@ Module:CreateModule("Movement", function(Module)
             local Hum = Char:FindFirstChildOfClass("Humanoid")
             if Hum then Hum.PlatformStand = false end
         end
-        destroyMobileControls()
     end
 
     function Movement:SetFlySpeed(S) SPEED = S end
@@ -670,6 +608,7 @@ Module:CreateModule("Movement", function(Module)
     function Movement:StartInfiniteJump()
         if IJumpConn then return end
         IJumpConn = UserInputService.JumpRequest:Connect(function()
+            if not Settings.InfiniteJump then return end
             local Char = LocalPlayer.Character; if not Char then return end
             local Hum = Char:FindFirstChildOfClass("Humanoid")
             if Hum then Hum:ChangeState(Enum.HumanoidStateType.Jumping) end
@@ -684,6 +623,7 @@ Module:CreateModule("Movement", function(Module)
     function Movement:StartSpinBot()
         if SpinConn then return end
         SpinConn = RunService.Heartbeat:Connect(function()
+            if not Settings.SpinBot then return end
             local Char = LocalPlayer.Character; if not Char then return end
             local HRP = Char:FindFirstChild("HumanoidRootPart"); if not HRP then return end
             HRP.CFrame = HRP.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
@@ -721,14 +661,67 @@ Module:CreateModule("Movement", function(Module)
 end)
 
 --==========================================================
+--          WEAPON MODULE (Auto Fire для Deagle Arena)
+--==========================================================
+Module:CreateModule("Weapon", function(Module)
+    local Weapon = {}
+    local AutoFireConn = nil
+    local nextShot = 0
+
+    function Weapon:StartAutoFire()
+        if AutoFireConn then return end
+        AutoFireConn = RunService.RenderStepped:Connect(function()
+            if not Settings.AutoFire then return end
+
+            local Char = LocalPlayer.Character
+            if not Char then return end
+
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            if not Hum or Hum.Health <= 0 then return end
+
+            local Tool = Char:FindFirstChildOfClass("Tool")
+            if not Tool then return end
+
+            local now = tick()
+            local delay = (Settings.AutoFireDelay or 100) / 1000
+            if now - nextShot < delay then return end
+            nextShot = now
+
+            pcall(function() Tool:Activate() end)
+        end)
+    end
+
+    function Weapon:StopAutoFire()
+        if AutoFireConn then AutoFireConn:Disconnect(); AutoFireConn = nil end
+    end
+
+    return Weapon
+end)
+
+--==========================================================
 --          MODULE REFS
 --==========================================================
 local Aimbot = Module.Aimbot
 local ESP = Module.ESP
 local Movement = Module.Movement
+local Weapon = Module.Weapon
 
 Connections.Connect(RunService.RenderStepped, function() ESP:Update() end)
 Connections.Connect(Players.PlayerRemoving, ESP.RemovePlayer)
+
+--==========================================================
+--          RESPAWN PERSISTENCE (фикс отрубающихся функций)
+--==========================================================
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.5)
+    if Settings.Fly then Movement:StartFly() end
+    if Settings.InfiniteJump and not _ENV.KotykIJ then
+        _ENV.KotykIJ = true
+        Movement:StartInfiniteJump()
+    end
+    if Settings.SpinBot then Movement:StartSpinBot() end
+    if Settings.AutoFire then Weapon:StartAutoFire() end
+end)
 
 --==========================================================
 --          WINDOW
@@ -807,9 +800,14 @@ local MovementTab = Plugins:CreateTab({ "Movement", "Fly, jump and spin" }) do
         Plugins:SetDefault("Fly", false)
         Plugins:SetDefault("FlySpeed", 60)
 
+        Plugins:Paragraph(Section, {
+            "Fly Controls",
+            "Mobile: use the thumbstick to move.\nLook UP to fly up, look DOWN to fly down.\nPC: WASD + Space/Ctrl.",
+        })
+
         Plugins:Toggle(Section, {
             "Fly",
-            isMobile and "Mobile: on-screen buttons appear" or "WASD move, Space up, Ctrl down"
+            "Enable flying"
         }, "Fly", function(v)
             if v then Movement:StartFly() else Movement:StopFly() end
         end)
@@ -842,6 +840,33 @@ local MovementTab = Plugins:CreateTab({ "Movement", "Fly, jump and spin" }) do
         Plugins:Toggle(Section, { "Third Person View", "Zoom out your camera" }, "ThirdPerson", function(v)
             if v then Movement:StartThirdPerson() else Movement:StopThirdPerson() end
         end)
+    end)
+end
+
+--==========================================================
+--          WEAPON TAB
+--==========================================================
+local WeaponTab = Plugins:CreateTab({ "Weapon", "Auto fire for Deagle Arena" }) do
+    WeaponTab:Section("Auto Fire", function(Section)
+        Plugins:SetDefault("AutoFire", false)
+        Plugins:SetDefault("AutoFireDelay", 100)
+
+        Plugins:Paragraph(Section, {
+            "Auto Fire — Deagle Arena",
+            "Automatically fires your current weapon using Tool:Activate().\nWorks in games that use the standard Roblox Tool API.",
+        })
+
+        Plugins:Toggle(Section, {
+            "Auto Fire",
+            "Automatically fire your weapon"
+        }, "AutoFire", function(v)
+            if v then Weapon:StartAutoFire() else Weapon:StopAutoFire() end
+        end)
+
+        Plugins:Slider(Section, {
+            "Fire Delay",
+            "Delay between shots in milliseconds"
+        }, { 10, 500, 10 }, "AutoFireDelay", function(v) end)
     end)
 end
 
